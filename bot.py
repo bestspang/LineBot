@@ -67,7 +67,7 @@ def handle_sticker_message(event):
     )
     line_bot_api.reply_message(
         event.reply_token,
-sticker_message)
+        sticker_message)
 
 if __name__ == "__main__":
     app.run()
