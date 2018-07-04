@@ -11,35 +11,24 @@ handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
 
 @app.route("/")
 def hello():
-    return "This is BP_LINEBOT!"
+    return "This is BP_LINEBOT2!"
 
 @app.route("/bot", methods=['POST'])
 def bot():
-        # ข้อความที่ต้องการส่งกลับ
-    replyQueue = list()
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
 
-    # ข้อความที่ได้รับมา
-    msg_in_json = request.get_json()
-    msg_in_string = json.dumps(msg_in_json)
+    # get request body as text
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
 
-    replyToken = msg_in_json["events"][0]['replyToken']
+    # handle webhook body
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
 
-    userID =  msg_in_json["events"][0]['source']['userId']
-    msgType =  msg_in_json["events"][0]['message']['type']
-
-    if msgType != 'text':
-        reply(replyToken, ['Only text is allowed.'])
-        return 'OK',200
-
-
-    text = msg_in_json["events"][0]['message']['text'].lower().strip()
-
-    replyQueue.append('นี่คือรูปแบบข้อความที่รับส่ง')
-
-    # ทดลอง Echo ข้อความกลับไปในรูปแบบที่ส่งไปมา (แบบ json)
-    replyQueue.append(msg_in_string)
-    reply(replyToken, replyQueue[:5])
-    return 'OK', 200
+    return 'OK'
 
 def reply(replyToken, textList):
 
