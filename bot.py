@@ -34,7 +34,7 @@ def bot():
 def handle_message(event):
     text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
     ce = random.randint(1,10)
-    if ce > 6:
+    if ce > 6 and ce < 9:
         line_bot_api.reply_message(
             event.reply_token,
             #TextSendMessage(text=event.message.text)
