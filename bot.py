@@ -1,5 +1,5 @@
 from flask import Flask, request, abort
-import json, requests
+import json, requests, random
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import (MessageEvent, TextMessage, TextSendMessage,)
@@ -32,9 +32,13 @@ def bot():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=event.message.text))
+    text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
+    ce = random.randint(1,10)
+    if ce > 6:
+        line_bot_api.reply_message(
+            event.reply_token,
+            #TextSendMessage(text=event.message.text)
+            TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
     app.run()
