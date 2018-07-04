@@ -30,25 +30,6 @@ def bot():
 
     return 'OK'
 
-def reply(replyToken, textList):
-
-    LINE_API = 'https://api.line.me/v2/bot/message/reply'
-    headers = {
-        'Content-Type': 'application/json; charset=UTF-8',
-        'Authorization': LINE_API_KEY
-    }
-    msgs = []
-    for text in textList:
-        msgs.append({
-            "type":"text",
-            "text":text
-        })
-    data = json.dumps({
-        "replyToken":replyToken,
-        "messages":msgs
-    })
-    requests.post(LINE_API, headers=headers, data=data)
-    return
 
 @handler.add(MessageEvent, message=StickerMessage)
 def handle_sticker_message(event):
