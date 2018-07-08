@@ -69,9 +69,9 @@ def stockPrice(stock_quote):
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     words_list = extractWord(event.message.text)
-    if 'หุ้น' in words_list and 'ราคา' in words_list:
+    if 'หุ้น' in words_list or 'ราคา' in words_list:
         price = (stockPrice(checkth(words_list)))
-        if price == None:
+        if price == 0:
             return 0
         else:
             line_bot_api.reply_message(
