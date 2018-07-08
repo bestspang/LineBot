@@ -1,7 +1,7 @@
 from flask import Flask, request, abort
 import json, requests, random, os
 import dialogflow
-from pythainlp.tokenize import word_tokenize
+from pythainlp.tokenize import word_tokenize, isthai
 from bs4 import BeautifulSoup as soup
 from html.parser import HTMLParser
 from urllib.request import urlopen as uReq
