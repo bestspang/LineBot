@@ -37,7 +37,7 @@ def bot():
     return 'OK'
 
 def extractWord(text):
-    a = word_tokenize(alist, engine='newmm')
+    a = word_tokenize(text, engine='newmm')
     b = []
     for h in a:
         if h != ' ':
