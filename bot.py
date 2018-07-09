@@ -63,6 +63,8 @@ def getTable(stock_quote):
     return page_soup.findAll("div", {"class":"col-xs-6"})#("table", {"class":"table table-info"})
 
 def stockPrice(stock_quote):
+    if stock_quote == 0 or stock_quote == None:
+        return 0
     price = getTable(stock_quote)
     try:
         price = price[2].text.strip()
@@ -107,14 +109,11 @@ def handle_message(event):
         elif price == 0:
             return 0
         else:
-            # if is_number(price) == False:
-            #     price = 'ราคายังไม่มีการอัพเดทครัช'
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=price))
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TextSendMessage(text=price))
+            if not is_number(price):
+                price = 'ราคายังไม่มีการอัพเดทครัช'
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
         return 0
 
     if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
