@@ -1,6 +1,8 @@
 from flask import Flask, request, abort
 import json, requests, random, os
 import dialogflow
+import numpy as np
+import pandas as pd
 from pythainlp.tokenize import word_tokenize, isthai
 from bs4 import BeautifulSoup as soup
 from html.parser import HTMLParser
@@ -8,7 +10,6 @@ from urllib.request import urlopen as uReq
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (InvalidSignatureError)
 from linebot.models import (MessageEvent, TextMessage, TextSendMessage,)
-
 
 app = Flask(__name__)
 
@@ -44,33 +45,57 @@ def extractWord(text):
             b.append(h)
     return b
 
-def checkth(lists):
+def getSymbol(lists):
     for i in range(len(lists)):
         if isthai(lists[i])['thai'] == 0:
             return lists[i]
     return 0
 
-def stockPrice(stock_quote):
+def getTable(stock_quote):
     if stock_quote == 0:
         return 0
     stock_quote = stock_quote.upper()
+    #url = 'http://www.settrade.com/C13_MarketSummary.jsp?detail=SET50'
     url = 'https://www.settrade.com/C04_01_stock_quote_p1.jsp?txtSymbol='+ stock_quote +'&ssoPageId=9&selectPage=1'
     uClient = uReq(url)
     page_html = uClient.read()
     uClient.close()
     page_soup = soup(page_html, "html.parser")
-    price = page_soup.findAll("div", {"class":"col-xs-6"})
+    return page_soup.findAll("div", {"class":"col-xs-6"})#("table", {"class":"table table-info"})
+
+def stockPrice(stock_quote):
+    price = getTable(stock_quote)
     try:
         price = price[2].text.strip()
         return ('หุ้น {} ราคาปัจจุบันอยู่ที่ {} บาท'.format(stock_quote, price))
     except:
         return ('ไม่มีข้อมูลหุ้นตัวนี้')
 
+def makeDF(soupdata, ind=0):
+    row_list = []
+    head_list = []
+    tr_list = soupdata[ind].findAll('tr')
+    for tr in tr_list:
+            th_list = tr.findAll('th')
+            if th_list is not None:
+                for th in th_list:
+                    head_list.append(th.text.replace(' ', '').strip().split('\r')[0])
+            td_list = tr.findAll('td')
+
+            for td in td_list:
+                row_list = np.append(row_list, td.text.replace(' ', '').strip())
+    head_list[0] = 'SYMBOL'
+    num_col = len(head_list)
+    total_col = int(len(row_list)/num_col)
+    row_list = np.reshape(row_list, (total_col, num_col) )
+    return pd.DataFrame(columns = head_list, data = row_list)
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
-        price = (stockPrice(checkth(words_list)))
+
+        price = (stockPrice(getSymbol(words_list)))
         if price == 0:
             return 0
         else:
@@ -78,8 +103,25 @@ def handle_message(event):
                 event.reply_token,
                 TextSendMessage(text=price))
         return 0
-    ce = random.randint(1,10)
 
+    if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
+        line_bot_api.reply_message(event.reply_token,
+            TextSendMessage(text='Most Active Value'))
+        return 0
+    if event.message.text.lower().replace(' ','') == 'Most Active Volume'.lower().replace(' ',''):
+        line_bot_api.reply_message(event.reply_token,
+            TextSendMessage(text='Most Active Volume'))
+        return 0
+    if event.message.text.lower().replace(' ','') == 'Top Gainers'.lower().replace(' ',''):
+        line_bot_api.reply_message(event.reply_token,
+            TextSendMessage(text='Top Gainers'))
+        return 0
+    if event.message.text.lower().replace(' ','') == 'Top Losers'.lower().replace(' ',''):
+        line_bot_api.reply_message(event.reply_token,
+            TextSendMessage(text='Top Losers'))
+        return 0
+
+    ce = random.randint(1,10)
     if ce > 6 and ce < 9:
         text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
         line_bot_api.reply_message(
