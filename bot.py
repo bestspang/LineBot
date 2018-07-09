@@ -107,7 +107,7 @@ def handle_message(event):
         elif price == 0:
             return 0
         else:
-            if not is_number(price):
+            if is_number(price) == False:
                 price = 'ราคายังไม่มีการอัพเดทครัช'
 
         line_bot_api.reply_message(
