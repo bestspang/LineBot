@@ -48,13 +48,12 @@ def extractWord(text):
 def getSymbol(lists):
     for i in range(len(lists)):
         if isthai(lists[i])['thai'] == 0:
-            return lists[i]
+            return lists[i].upper()
     return 0
 
 def getTable(stock_quote):
     if stock_quote == 0:
         return 0
-    stock_quote = stock_quote.upper()
     #url = 'http://www.settrade.com/C13_MarketSummary.jsp?detail=SET50'
     url = 'https://www.settrade.com/C04_01_stock_quote_p1.jsp?txtSymbol='+ stock_quote +'&ssoPageId=9&selectPage=1'
     uClient = uReq(url)
@@ -102,9 +101,11 @@ def handle_message(event):
             return 0
         else:
             try:
-                float(price) / 2
+                complex(price)
+                print(price)
             except:
                 price = 'ราคายังไม่มีการอัพเดทครัช'
+
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
