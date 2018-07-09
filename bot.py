@@ -94,14 +94,20 @@ def makeDF(soupdata, ind=0):
 def handle_message(event):
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
-
-        price = (stockPrice(getSymbol(words_list)))
-        if price == 0:
+        symbo = getSymbol(words_list)
+        price = (stockPrice(symbo))
+        if symbo == 'SET' or symbo == 'SET50':
+            price = 'กำลังอัพเดทระบบ SET ค่ะหนูน้อย ใจเย็นๆ'
+        elif price == 0:
             return 0
         else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=price))
+            try:
+                price / 2
+            except:
+                price = 'ราคายังไม่มีการอัพเดทครัช'
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
         return 0
 
     if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
