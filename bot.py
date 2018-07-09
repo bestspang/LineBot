@@ -68,10 +68,10 @@ def stockPrice(stock_quote):
     price = getTable(stock_quote)
     try:
         price = price[2].text.strip()
-        text = 'หุ้น {} ราคาปัจจุบันอยู่ที่ {} บาท'.format(stock_quote, price)
+        text = ('หุ้น {} ราคาปัจจุบันอยู่ที่ {} บาท'.format(stock_quote, price))
         return (text, price)
     except:
-        return ('ไม่มีข้อมูลหุ้นตัวนี้')
+        return ('ไม่มีข้อมูลหุ้นตัวนี้', None)
 
 def makeDF(soupdata, ind=0):
     row_list = []
@@ -104,7 +104,7 @@ def handle_message(event):
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
         symbo = getSymbol(words_list)
-        text, price = stockPrice(symbo)
+        price, money = stockPrice(symbo)
         if symbo == 'SET' or symbo == 'SET50':
             price = 'กำลังอัพเดทระบบ SET ค่ะหนูน้อย ใจเย็นๆ'
         elif price == 0:
