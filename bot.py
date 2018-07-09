@@ -89,6 +89,13 @@ def makeDF(soupdata, ind=0):
     row_list = np.reshape(row_list, (total_col, num_col) )
     return pd.DataFrame(columns = head_list, data = row_list)
 
+def is_number(s):
+    try:
+        float(s)
+        return True
+    except ValueError:
+        return False
+
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     words_list = extractWord(event.message.text)
@@ -100,10 +107,7 @@ def handle_message(event):
         elif price == 0:
             return 0
         else:
-            try:
-                complex(price)
-                print(price)
-            except:
+            if not is_number(s):
                 price = 'ราคายังไม่มีการอัพเดทครัช'
 
         line_bot_api.reply_message(
