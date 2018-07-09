@@ -102,7 +102,7 @@ def handle_message(event):
             return 0
         else:
             try:
-                price / 2
+                float(price) / 2
             except:
                 price = 'ราคายังไม่มีการอัพเดทครัช'
         line_bot_api.reply_message(
