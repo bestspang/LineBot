@@ -68,7 +68,7 @@ def stockPrice(stock_quote):
     price = getTable(stock_quote)
     try:
         price = price[2].text.strip()
-        return ('หุ้น {} ราคาปัจจุบันอยู่ที่ {} บาท'.format(stock_quote, price))
+        return ('หุ้น {} ราคาปัจจุบันอยู่ที่ {} บาท'.format(stock_quote, price)), price
     except:
         return ('ไม่มีข้อมูลหุ้นตัวนี้')
 
@@ -103,13 +103,13 @@ def handle_message(event):
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
         symbo = getSymbol(words_list)
-        price = (stockPrice(symbo))
+        price, money = stockPrice(symbo)
         if symbo == 'SET' or symbo == 'SET50':
             price = 'กำลังอัพเดทระบบ SET ค่ะหนูน้อย ใจเย็นๆ'
         elif price == 0:
             return 0
         else:
-            if is_number(price):
+            if is_number(money):
                 price = 'ราคายังไม่มีการอัพเดทครัช'
         line_bot_api.reply_message(
             event.reply_token,
