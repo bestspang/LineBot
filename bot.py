@@ -177,6 +177,7 @@ def handle_message(event):
 
     if 'trackid' in words_list or 'รหัส' in words_list:
         #'รหัส SMLp000341000'.split(' ')[1].upper()
+        price = 0
         if len(event.message.text.split(' ')) > 2:
             price = "โปรดพิิม'รหัส'เว้นวรรคและตามด้วย'Track ID'"
         elif price == 0:
@@ -188,7 +189,7 @@ def handle_message(event):
             flat_data = list_flatten(clean_data)
             np = makeNP(flat_data)
             price = ('ขณะนี้{} เมื่อวันที่ {} เวลา {} โดยคุณ{} ที่จังหวัด{}'.format(np[0][2], np[0][0], np[0][1], np[0][3], np[0][5]))
-            
+
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
