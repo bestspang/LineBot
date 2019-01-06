@@ -189,7 +189,10 @@ def handle_message(event):
             clean_data = cleanData(data)
             flat_data = list_flatten(clean_data)
             np = makeNP(flat_data)
-            price = ('ขณะนี้{} เมื่อวันที่ {} เวลา {} โดยคุณ{} ที่จังหวัด{}'.format(np[0][2], np[0][0], np[0][1], np[0][3], np[0][5]))
+            if str(np[0][3]) == 'None':
+                price = ('ขณะนี้{} เมื่อวันที่ {} เวลา {} ที่จังหวัด{}'.format(np[0][2], np[0][0], np[0][1], np[0][5]))
+            else:
+                price = ('ขณะนี้{} เมื่อวันที่ {} เวลา {} โดยคุณ{} ที่จังหวัด{}'.format(np[0][2], np[0][0], np[0][1], np[0][3], np[0][5]))
 
         line_bot_api.reply_message(
             event.reply_token,
