@@ -182,7 +182,6 @@ def handle_message(event):
             price = "โปรดพิม'รหัส'เว้นวรรคและตามด้วย'Track ID'"
         elif len(event.message.text.split(' ')) == 1:
             price = "รหัสอะไรฟะ บอกกูด้วย"
-            return 0
         else:
             track_id = event.message.text.split(' ')[1].upper()
             data = getData(track_id)
