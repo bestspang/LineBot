@@ -34,6 +34,7 @@ def stockPrice(stock_quote):
         return ('ไม่มีข้อมูลหุ้นตัวนี้')
 
 
+
 text = input('thai sentence: ')
 words_list = extractWord(text)
 print(words_list)
