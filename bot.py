@@ -247,10 +247,10 @@ def handle_message(event):
 
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
-        text = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
+        texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=text[random.randint(0,7)]))
+            TextSendMessage(text=texts[random.randint(0,7)]))
         return 0
 
     ##################
@@ -514,8 +514,7 @@ def handle_message(event):
                         ),
                     ])))
     else:
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.message.text))
+        pass
     ##################
 
     if ce > 6 and ce < 9:
