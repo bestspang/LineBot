@@ -1,1 +1,1 @@
-MemberJoinedEvent, 
+MemberJoinedEvent, MemberLeftEvent,

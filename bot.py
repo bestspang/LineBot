@@ -19,7 +19,7 @@ from linebot.models import (MessageEvent, TextMessage, TextSendMessage,
     StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
     ImageMessage, VideoMessage, AudioMessage, FileMessage,
     UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
-    MemberLeftEvent,FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
+    FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
     TextComponent, SpacerComponent, IconComponent, ButtonComponent,
     SeparatorComponent, QuickReply, QuickReplyButton,
     ImageSendMessage)
