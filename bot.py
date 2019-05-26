@@ -240,10 +240,17 @@ def handle_message(event):
             TextSendMessage(text=price))
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=text))
+            TextSendMessage(text=quote))
         return 0
 
     ce = random.randint(1,10)
+    if 'แบม' in words_list or 'บี้' in words_list:
+        text = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text[random.randint(0,7)]))
+        return 0
+
     if ce > 6 and ce < 9:
         text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
         line_bot_api.reply_message(
