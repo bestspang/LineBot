@@ -21,7 +21,7 @@ idna==2.7
 imgurpython==1.1.7
 itsdangerous==0.24
 Jinja2==2.10
-line-bot-sdk==1.7.2
+line-bot-sdk==1.8.0
 lxml==4.2.3
 marisa-trie==0.7.4
 MarkupSafe==1.0
