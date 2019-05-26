@@ -52,7 +52,7 @@ def getData(track_id):
     site_data = site_content.findAll("div", {"class":"col colStatus"})
     return site_data
 
-def getQuote(track_id):
+def getQuote():
     print("\n")
     url = 'http://quotes.rest/qod.json'
     print("connecting.. : " + url + "\n")
@@ -60,11 +60,13 @@ def getQuote(track_id):
     headers = requests.utils.default_headers()
     headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
     site_request = requests.get(url, headers=headers)
+    site_content = soup(site_request.content, "html.parser")
     data = json.loads(site_request.text)
-    try:
-        return list(data['contents']['quotes']['quote'])
-    except:
-        return data
+
+    quote = data['contents']['quotes']
+    quote = [quote[0]['quote'], quote[0]['author']]
+    quote = "{} - {}".format(quote[0], quote[1])
+    return quote
 
 def cleanData(site_data, ind=0):
     list = []
@@ -115,7 +117,7 @@ def extractWord(text):
     b = []
     for h in a:
         if h != ' ':
-            b.append(h)
+            b.append(h.lower())
     return b
 
 def getSymbol(lists):
@@ -230,11 +232,15 @@ def handle_message(event):
             TextSendMessage(text='Top Losers'))
         return 0
 
-    if 'เทส' in words_list or 'test' in words_list:
+    if 'ทดลอง' in words_list or 'test' in words_list:
         price = 'นี้คือระบบ test ครับ'
+        quote = getQuote()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text))
         return 0
 
     ce = random.randint(1,10)
