@@ -237,6 +237,7 @@ def handle_message(event):
         price = 'นี้คือระบบ test ครับ'
         quote = getQuote()
 <<<<<<< HEAD
+<<<<<<< HEAD
         try:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -246,6 +247,8 @@ def handle_message(event):
             print(e.error.message)
             print(e.error.details)
 =======
+=======
+>>>>>>> parent of 4775262a... Update bot.py
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
