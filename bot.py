@@ -238,6 +238,7 @@ def handle_message(event):
         quote = getQuote()
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
         try:
             line_bot_api.reply_message(
                 event.reply_token,
@@ -247,6 +248,8 @@ def handle_message(event):
             print(e.error.message)
             print(e.error.details)
 =======
+=======
+>>>>>>> parent of 4775262a... Update bot.py
 =======
 >>>>>>> parent of 4775262a... Update bot.py
         line_bot_api.reply_message(
