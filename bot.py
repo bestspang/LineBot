@@ -235,9 +235,9 @@ def handle_message(event):
     if 'ทดลอง' in words_list or 'test' in words_list:
         price = 'นี้คือระบบ test ครับ'
         quote = getQuote()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price))
+        # line_bot_api.reply_message(
+        #     event.reply_token,
+        #     TextSendMessage(text=price))
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=quote))
