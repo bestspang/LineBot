@@ -189,6 +189,7 @@ def is_number(s):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    text = event.message.text
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
         symbo = getSymbol(words_list)
@@ -246,28 +247,19 @@ def handle_message(event):
         return 0
 
     if 'ทดลอง' in words_list or 'test' in words_list:
-        # price = 'นี้คือระบบ test ครับ'
-        # quote = getQuote()
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TextSendMessage(text=price))
+        price = 'นี้คือระบบ test ครับ'
+        quote = getQuote()
         try:
-            profile = line_bot_api.get_group_member_profile()
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=quote))
         except linebot.exceptions.LineBotApiError as e:
             print(e.status_code)
             print(e.error.message)
             print(e.error.details)
-
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=profile.display_name))
         return 0
 
-
-
-
 ######################
-    text = event.message.text
 
     if text == 'profile':
         if isinstance(event.source, SourceUser):
