@@ -8,7 +8,7 @@ def extractWord(text):
     b = []
     for h in a:
         if h != ' ':
-            b.append(h)
+            b.append(h.lower())
     return b
 
 def checkth(lists):
