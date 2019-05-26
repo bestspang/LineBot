@@ -177,7 +177,7 @@ def is_number(s):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    text = event.message.text.lowercase()
+    text = event.message.text.lower()
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
         symbo = getSymbol(words_list)
