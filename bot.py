@@ -66,6 +66,7 @@ def getQuote():
     quote = data['contents']['quotes']
     quote = [quote[0]['quote'], quote[0]['author']]
     quote = "{} - {}".format(quote[0], quote[1])
+    print(quote)
     return quote
 
 def cleanData(site_data, ind=0):
