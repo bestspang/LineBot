@@ -1,7 +1,6 @@
 # coding: utf-8
 
 from pandas.io.msgpack import packb, unpackb
-
 from .common import frombytes
 
 

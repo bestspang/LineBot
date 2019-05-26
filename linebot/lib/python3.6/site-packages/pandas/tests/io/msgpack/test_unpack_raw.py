@@ -1,7 +1,6 @@
 """Tests for cases where the user seeks to obtain packed msgpack objects"""
 
 import io
-
 from pandas.io.msgpack import Unpacker, packb
 
 

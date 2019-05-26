@@ -1,11 +1,10 @@
 #
 # This file is part of pyasn1 software.
 #
-# Copyright (c) 2005-2019, Ilya Etingof <etingof@gmail.com>
+# Copyright (c) 2005-2018, Ilya Etingof <etingof@gmail.com>
 # License: http://snmplabs.com/pyasn1/license.html
 #
 import logging
-import sys
 
 from pyasn1 import __version__
 from pyasn1 import error
@@ -13,19 +12,17 @@ from pyasn1.compat.octets import octs2ints
 
 __all__ = ['Debug', 'setLogger', 'hexdump']
 
-DEBUG_NONE = 0x0000
-DEBUG_ENCODER = 0x0001
-DEBUG_DECODER = 0x0002
-DEBUG_ALL = 0xffff
+flagNone = 0x0000
+flagEncoder = 0x0001
+flagDecoder = 0x0002
+flagAll = 0xffff
 
-FLAG_MAP = {
-    'none': DEBUG_NONE,
-    'encoder': DEBUG_ENCODER,
-    'decoder': DEBUG_DECODER,
-    'all': DEBUG_ALL
+flagMap = {
+    'none': flagNone,
+    'encoder': flagEncoder,
+    'decoder': flagDecoder,
+    'all': flagAll
 }
-
-LOGGEE_MAP = {}
 
 
 class Printer(object):
@@ -69,7 +66,7 @@ class Debug(object):
     defaultPrinter = Printer()
 
     def __init__(self, *flags, **options):
-        self._flags = DEBUG_NONE
+        self._flags = flagNone
 
         if 'loggerName' in options:
             # route our logs to parent logger
@@ -92,9 +89,9 @@ class Debug(object):
                 flag = flag[1:]
             try:
                 if inverse:
-                    self._flags &= ~FLAG_MAP[flag]
+                    self._flags &= ~flagMap[flag]
                 else:
-                    self._flags |= FLAG_MAP[flag]
+                    self._flags |= flagMap[flag]
             except KeyError:
                 raise error.PyAsn1Error('bad debug flag %s' % flag)
 
@@ -112,26 +109,17 @@ class Debug(object):
     def __rand__(self, flag):
         return flag & self._flags
 
-_LOG = DEBUG_NONE
+
+logger = 0
 
 
 def setLogger(userLogger):
-    global _LOG
+    global logger
 
     if userLogger:
-        _LOG = userLogger
+        logger = userLogger
     else:
-        _LOG = DEBUG_NONE
-
-    # Update registered logging clients
-    for module, (name, flags) in LOGGEE_MAP.items():
-        setattr(module, name, _LOG & flags and _LOG or DEBUG_NONE)
-
-
-def registerLoggee(module, name='LOG', flags=DEBUG_NONE):
-    LOGGEE_MAP[sys.modules[module]] = name, flags
-    setLogger(_LOG)
-    return _LOG
+        logger = 0
 
 
 def hexdump(octets):

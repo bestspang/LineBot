@@ -1,8 +1,8 @@
-import numpy as np
 import pytest
-
-from pandas import Series, SparseSeries
+import numpy as np
+from pandas import SparseSeries, Series
 from pandas.util import testing as tm
+
 
 pytestmark = pytest.mark.skip("Wrong SparseBlock initialization (GH 17386)")
 
@@ -18,7 +18,8 @@ pytestmark = pytest.mark.skip("Wrong SparseBlock initialization (GH 17386)")
         np.nan, np.nan
     ]
 ])
-@pytest.mark.xfail(reason='Wrong SparseBlock initialization (GH#17386)')
+@pytest.mark.xfail(reason='Wrong SparseBlock initialization '
+                          '(GH 17386)')
 def test_where_with_numeric_data(data):
     # GH 17386
     lower_bound = 1.5
@@ -69,7 +70,8 @@ def test_where_with_numeric_data_and_other(data, other):
     tm.assert_sp_series_equal(result, sparse_expected)
 
 
-@pytest.mark.xfail(reason='Wrong SparseBlock initialization (GH#17386)')
+@pytest.mark.xfail(reason='Wrong SparseBlock initialization '
+                          '(GH 17386)')
 def test_where_with_bool_data():
     # GH 17386
     data = [False, False, True, True, False, False]
