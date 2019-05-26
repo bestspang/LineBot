@@ -15,6 +15,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi('Z7FgW5zgSO1G9BaHiMJOCKTByoH6Fl9gFIam59JdkfVXaavM8k8DEsEfLZpWmBlNDbWv/q4wYA0mY/gJWLfNUBFX8yNp+5A5THgSjLzx6DTLVi5x69Ejbd1JRLBOtiS7/HoOmKHJDvmmlDEt2DXj1QdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
+#profile = line_bot_api.get_group_member_profile(group_id, user_id)
 
 @app.route("/")
 def hello():
@@ -50,6 +51,20 @@ def getData(track_id):
     site_content = soup(site_request.content, "html.parser")
     site_data = site_content.findAll("div", {"class":"col colStatus"})
     return site_data
+
+def getQuote(track_id):
+    print("\n")
+    url = 'http://quotes.rest/qod.json'
+    print("connecting.. : " + url + "\n")
+
+    headers = requests.utils.default_headers()
+    headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
+    site_request = requests.get(url, headers=headers)
+    data = json.loads(site_request.text)
+    try:
+        return list(data['contents']['quotes']['quote'])
+    except:
+        return data
 
 def cleanData(site_data, ind=0):
     list = []
@@ -213,6 +228,13 @@ def handle_message(event):
     if event.message.text.lower().replace(' ','') == 'Top Losers'.lower().replace(' ',''):
         line_bot_api.reply_message(event.reply_token,
             TextSendMessage(text='Top Losers'))
+        return 0
+
+    if 'เทส' in words_list or 'test' in words_list:
+        price = 'นี้คือระบบ test ครับ'
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
         return 0
 
     ce = random.randint(1,10)
