@@ -255,7 +255,7 @@ def handle_message(event):
             TextSendMessage(text='Top Losers'))
         return 0
 
-    if 'ทดลอง' in words_list or 'test' in words_list:
+    if 'ทดลอง' in words_list or 'quote' in words_list:
         price = 'นี้คือระบบ test ครับ'
         quote = getQuote()
         # line_bot_api.reply_message(
@@ -377,8 +377,9 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text="Bot can't leave from 1:1 chat"))
+
     elif text == 'image':
-        url = request.url_root + '/static/logo.png'
+        url = request.url_root + '/static/doge.jpg'
         app.logger.info("url=" + url)
         line_bot_api.reply_message(
             event.reply_token,
