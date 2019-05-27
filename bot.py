@@ -414,9 +414,7 @@ def handle_message(event):
                 URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
                 URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
                 URIAction(label='ใบเบิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
-                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
-                #MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
-                #MessageAction(label='ไม่มีไร', text='จ่ะ')
+                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8')
             ])
         template_message = TemplateSendMessage(
             alt_text='Buttons alt text', template=buttons_template)
