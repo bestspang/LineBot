@@ -538,7 +538,7 @@ def handle_message(event):
 
     ########## NEW #############
 
-    @handler.add(MessageEvent, message=LocationMessage)
+@handler.add(MessageEvent, message=LocationMessage)
 def handle_location_message(event):
     line_bot_api.reply_message(
         event.reply_token,
