@@ -31,6 +31,7 @@ handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+
 def make_static_tmp_dir():
     try:
         os.makedirs(static_tmp_path)
@@ -406,7 +407,7 @@ def handle_message(event):
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
 
-    elif 'ขอ' in words_list and 'ฟอร์ม' in words_list:
+    elif 'ขอ' in words_list or 'ฟอร์ม' in words_list:
         buttons_template = ButtonsTemplate(
             title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
                 URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
