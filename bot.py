@@ -30,6 +30,7 @@ line_bot_api = LineBotApi('Z7FgW5zgSO1G9BaHiMJOCKTByoH6Fl9gFIam59JdkfVXaavM8k8DE
 handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 
+static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 def make_static_tmp_dir():
     try:
         os.makedirs(static_tmp_path)
@@ -266,21 +267,6 @@ def handle_message(event):
             TextSendMessage(text=quote))
         return 0
 
-    if 'ขอ' in words_list and 'ฟอร์ม' in words_list:
-        buttons_template = ButtonsTemplate(
-            title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
-                URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
-                URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
-                URIAction(label='ใบเบิิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
-                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
-                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
-                MessageAction(label='ไม่มีไร', text='จ่ะ')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-        return 0
-
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
         texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
@@ -419,6 +405,21 @@ def handle_message(event):
         template_message = TemplateSendMessage(
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
+
+    elif 'ขอ' in words_list and 'ฟอร์ม' in words_list:
+        buttons_template = ButtonsTemplate(
+            title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
+                URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
+                URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
+                URIAction(label='ใบเบิิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
+                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
+                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+                MessageAction(label='ไม่มีไร', text='จ่ะ')
+            ])
+        template_message = TemplateSendMessage(
+            alt_text='Buttons alt text', template=buttons_template)
+        line_bot_api.reply_message(event.reply_token, template_message)
+
     elif text == 'carousel':
         carousel_template = CarouselTemplate(columns=[
             CarouselColumn(text='hoge1', title='fuga1', actions=[
