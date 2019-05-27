@@ -1,5 +1,5 @@
-from flask import Flask, request, abort
-import json, requests, random, os
+from flask import Flask, request, abort, send_from_directory
+import json, requests, random, os, errno, sys, tempfile
 import dialogflow
 import numpy as np
 import pandas as pd
@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup as soup
 from html.parser import HTMLParser
 from urllib.request import urlopen as uReq
 from linebot import (LineBotApi, WebhookHandler)
-from linebot.exceptions import (InvalidSignatureError)
+from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import (MessageEvent, TextMessage, TextSendMessage,
     SourceUser, SourceGroup, SourceRoom,
     TemplateSendMessage, ConfirmTemplate, MessageAction,
@@ -30,9 +30,18 @@ line_bot_api = LineBotApi('Z7FgW5zgSO1G9BaHiMJOCKTByoH6Fl9gFIam59JdkfVXaavM8k8DE
 handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 
+def make_static_tmp_dir():
+    try:
+        os.makedirs(static_tmp_path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(static_tmp_path):
+            pass
+        else:
+            raise
+
 @app.route("/")
 def hello():
-    return "This is BP_LINEBOT2!"
+    return "This is BP_LINEBOT2 (Mr.Doge)!"
 
 @app.route("/bot", methods=['POST'])
 def bot():
