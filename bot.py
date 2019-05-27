@@ -395,6 +395,7 @@ def handle_message(event):
         template_message = TemplateSendMessage(
             alt_text='Confirm alt text', template=confirm_template)
         line_bot_api.reply_message(event.reply_token, template_message)
+
     elif text == 'buttons':
         buttons_template = ButtonsTemplate(
             title='My buttons sample', text='Hello, my buttons', actions=[
@@ -407,14 +408,14 @@ def handle_message(event):
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
 
-    elif 'ขอ' in words_list or 'ฟอร์ม' in words_list:
+    elif 'ขอ' in words_list and 'ฟอร์ม' in words_list:
         buttons_template = ButtonsTemplate(
             title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
                 URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
                 URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
                 URIAction(label='ใบเบิิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
-                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
-                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+                #URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
+                #MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
                 MessageAction(label='ไม่มีไร', text='จ่ะ')
             ])
         template_message = TemplateSendMessage(
