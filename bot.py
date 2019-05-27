@@ -293,6 +293,16 @@ def handle_message(event):
                 ]
             )
 
+        elif isinstance(event.source, SourceRoom):
+            member_ids_res = line_bot_api.get_room_member_ids(event.source.room_id)
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text="Bot is in a Room!"),
+                    TextSendMessage(text='Room id: ' + event.source.room_id),
+                    TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
+                ]
+            )
+
         else:
             line_bot_api.reply_message(
                 event.reply_token, [
