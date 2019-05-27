@@ -422,15 +422,15 @@ def handle_message(event):
 
     elif 'ขอ' in words_list and ('เมนู' in words_list or 'เมนูอื่นๆ' in words_list):
         carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='hoge1', title='fuga1', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping'),
-                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+            CarouselColumn(text='Page 1', title='เมนูหลัก', actions=[
+                URIAction(label='ไปยัง NAS', uri='http://bestspang.quickconnect.to'),
+                URIAction(label='Trello', uri='https://trello.com/b/0WqzlKN6'),
+                PostbackAction(label='ใบร่างใบเสนอราคา', data='Coming Soon!')
             ]),
-            CarouselColumn(text='hoge2', title='fuga2', actions=[
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米'),
-                MessageAction(label='ไม่มีไร', text='จ่ะ')
+            CarouselColumn(text='Page 2', title='อื่นๆ', actions=[
+                URIAction(label='Abbok Login', uri='https://www.abbok.net/login'),
+                URIAction(label='Fact Sheet', uri='https://docs.google.com/spreadsheets/d/1VEkNq4wPStfJ6Zfp3BOluY3hAkoP1V2AwkOmMImDU7o/edit?usp=sharing'),
+                PostbackAction(label='ไม่มีไร', data='จ่ะ!')
             ]),
         ])
         template_message = TemplateSendMessage(
