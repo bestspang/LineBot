@@ -1,6 +1,6 @@
-from flask import Flask, request, abort, send_from_directory
+from flask import Flask, request, abort, send_from_directory, jsonify, render_template
 import json, requests, random, os, errno, sys, tempfile
-import dialogflow
+import dialogflow, pusher
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize, isthai
