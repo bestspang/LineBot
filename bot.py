@@ -415,7 +415,7 @@ def handle_message(event):
                 URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
                 URIAction(label='ใบเบิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
                 URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
-                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+                #MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
                 #MessageAction(label='ไม่มีไร', text='จ่ะ')
             ])
         template_message = TemplateSendMessage(
@@ -426,7 +426,9 @@ def handle_message(event):
         carousel_template = CarouselTemplate(columns=[
             CarouselColumn(text='hoge1', title='fuga1', actions=[
                 URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping')
+                PostbackAction(label='ping', data='ping'),
+                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+                MessageAction(label='ไม่มีไร', text='จ่ะ')
             ]),
             CarouselColumn(text='hoge2', title='fuga2', actions=[
                 PostbackAction(label='ping with text', data='ping', text='ping'),
