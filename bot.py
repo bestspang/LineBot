@@ -668,7 +668,7 @@ def handle_member_left(event):
 
 @app.route('/static/<path:path>')
 def send_static_content(path):
-return send_from_directory('static', path)
+    return send_from_directory('static', path)
 
 
     ##################
