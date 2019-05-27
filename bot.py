@@ -278,15 +278,29 @@ def handle_message(event):
             line_bot_api.reply_message(
                 event.reply_token, [
                     TextSendMessage(text='User id: ' + event.source.user_id),
-                    TextSendMessage(text='Group id: ' + event.source.group_id),
                     TextSendMessage(text='Display name: ' + profile.display_name),
                     TextSendMessage(text='Status message: ' + profile.status_message)
                 ]
             )
+
+        elif isinstance(event.source, SourceGroup):
+            member_ids_res = line_bot_api.get_group_member_ids(event.source.group_id)
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text="Bot is in a Group!"),
+                    TextSendMessage(text='Group id: ' + event.source.group_id),
+                    TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
+                ]
+            )
+
         else:
             line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't use profile API without user ID"))
+                event.reply_token, [
+                    TextSendMessage(text="Bot can't use profile API without user ID")
+                ]
+            )
+
+
     elif text == 'quota':
         quota = line_bot_api.get_message_quota()
         line_bot_api.reply_message(
