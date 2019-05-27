@@ -425,12 +425,12 @@ def handle_message(event):
             CarouselColumn(text='Page 1', title='เมนูหลัก', actions=[
                 URIAction(label='ไปยัง NAS', uri='http://bestspang.quickconnect.to'),
                 URIAction(label='Trello', uri='https://trello.com/b/0WqzlKN6'),
-                PostbackAction(label='ใบร่างใบเสนอราคา', data='Coming Soon!')
+                PostbackAction(label='ใบร่างใบเสนอราคา', data='comingsoon')
             ]),
             CarouselColumn(text='Page 2', title='อื่นๆ', actions=[
                 URIAction(label='Abbok Login', uri='https://www.abbok.net/login'),
                 URIAction(label='Fact Sheet', uri='https://docs.google.com/spreadsheets/d/1VEkNq4wPStfJ6Zfp3BOluY3hAkoP1V2AwkOmMImDU7o/edit?usp=sharing'),
-                PostbackAction(label='ไม่มีไร', data='จ่ะ!')
+                PostbackAction(label='ไม่มีไร', data='nothing')
             ]),
         ])
         template_message = TemplateSendMessage(
@@ -704,6 +704,12 @@ def handle_postback(event):
     if event.postback.data == 'ping':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='pong'))
+    elif event.postback.data == 'comingsoon':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='ระบบมาเร็วๆนี้ โฮ่งง'))
+    elif event.postback.data == 'nothing':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='กดหาdad'))
     elif event.postback.data == 'datetime_postback':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
