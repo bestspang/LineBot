@@ -317,6 +317,7 @@ def handle_message(event):
     if 'ทดลอง' in words_list or 'test' in words_list:
         price = 'นี้คือระบบ test ครับ'
         textn = text.replace('ทดลอง ', '').replace('test ', '')
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./path_to.json"
         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
         fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
         response_text = fulfillment_text
