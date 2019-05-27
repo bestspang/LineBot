@@ -426,11 +426,11 @@ def handle_message(event):
                 URIAction(label='Go to line.me', uri='https://line.me'),
                 PostbackAction(label='ping', data='ping'),
                 MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
-                MessageAction(label='ไม่มีไร', text='จ่ะ')
             ]),
             CarouselColumn(text='hoge2', title='fuga2', actions=[
                 PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
+                MessageAction(label='Translate Rice', text='米'),
+                MessageAction(label='ไม่มีไร', text='จ่ะ')
             ]),
         ])
         template_message = TemplateSendMessage(
