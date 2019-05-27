@@ -266,6 +266,21 @@ def handle_message(event):
             TextSendMessage(text=quote))
         return 0
 
+    if 'ขอ' in words_list and 'ฟอร์ม' in words_list:
+        buttons_template = ButtonsTemplate(
+            title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
+                URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
+                URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
+                URIAction(label='ใบเบิิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
+                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8'),
+                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
+                MessageAction(label='ไม่มีไร', text='จ่ะ')
+            ])
+        template_message = TemplateSendMessage(
+            alt_text='Buttons alt text', template=buttons_template)
+        line_bot_api.reply_message(event.reply_token, template_message)
+        return 0
+
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
         texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
@@ -714,4 +729,5 @@ def send_static_content(path):
             TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
+    make_static_tmp_dir()
     app.run()
