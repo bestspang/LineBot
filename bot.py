@@ -41,6 +41,19 @@ def make_static_tmp_dir():
         else:
             raise
 
+def detect_intent_texts(project_id, session_id, text, language_code):
+    session_client = dialogflow.SessionsClient()
+    session = session_client.session_path(project_id, session_id)
+
+    if text:
+        text_input = dialogflow.types.TextInput(
+            text=text, language_code=language_code)
+        query_input = dialogflow.types.QueryInput(text=text_input)
+        response = session_client.detect_intent(
+            session=session, query_input=query_input)
+
+        return response.query_result.fulfillment_text
+
 @app.route("/")
 def hello():
     return "This is BP_LINEBOT2 (Mr.Doge)!"
@@ -61,6 +74,39 @@ def bot():
         abort(400)
 
     return 'OK'
+
+@app.route('/static/<path:path>')
+def send_static_content(path):
+    return send_from_directory('static', path)
+
+# @app.route('/get_movie_detail', methods=['POST'])
+#     def get_movie_detail():
+#         data = request.get_json(silent=True)
+#         movie = data['queryResult']['parameters']['movie']
+#         api_key = os.getenv('OMDB_API_KEY')
+#
+#         movie_detail = requests.get('http://www.omdbapi.com/?t={0}&apikey={1}'.format(movie, api_key)).content
+#         movie_detail = json.loads(movie_detail)
+#         response =  """
+#             Title : {0}
+#             Released: {1}
+#             Actors: {2}
+#             Plot: {3}
+#         """.format(movie_detail['Title'], movie_detail['Released'], movie_detail['Actors'], movie_detail['Plot'])
+#
+#         reply = {
+#             "fulfillmentText": response,
+#         }
+#
+#         return jsonify(reply)
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    message = request.form['message']
+    project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+    fulfillment_text = detect_intent_texts(project_id, "unique", message, 'th')
+    response_text = { "message":  fulfillment_text }
+    return jsonify(response_text)
 
 def getData(track_id):
     if track_id == 0:
@@ -257,7 +303,7 @@ def handle_message(event):
             TextSendMessage(text='Top Losers'))
         return 0
 
-    if 'ทดลอง' in words_list or 'quote' in words_list:
+    if 'คำคม' in words_list or 'quote' in words_list:
         price = 'นี้คือระบบ test ครับ'
         quote = getQuote()
         # line_bot_api.reply_message(
@@ -266,6 +312,17 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=quote))
+        return 0
+
+    if 'ทดลอง' in words_list or 'test' in words_list:
+        price = 'นี้คือระบบ test ครับ'
+        textn = text.replace('ทดลอง ', '').replace('test ', '')
+        project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+        fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
+        response_text = fulfillment_text
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
         return 0
 
     ce = random.randint(1,10)
@@ -740,31 +797,6 @@ def handle_beacon(event):
 # def handle_member_left(event):
 #     app.logger.info("Got memberLeft event")
 
-
-@app.route('/static/<path:path>')
-def send_static_content(path):
-    return send_from_directory('static', path)
-
-@app.route('/get_movie_detail', methods=['POST'])
-    def get_movie_detail():
-        data = request.get_json(silent=True)
-        movie = data['queryResult']['parameters']['movie']
-        api_key = os.getenv('OMDB_API_KEY')
-
-        movie_detail = requests.get('http://www.omdbapi.com/?t={0}&apikey={1}'.format(movie, api_key)).content
-        movie_detail = json.loads(movie_detail)
-        response =  """
-            Title : {0}
-            Released: {1}
-            Actors: {2}
-            Plot: {3}
-        """.format(movie_detail['Title'], movie_detail['Released'], movie_detail['Actors'], movie_detail['Plot'])
-
-        reply = {
-            "fulfillmentText": response,
-        }
-
-        return jsonify(reply)
 
 
     ##################
