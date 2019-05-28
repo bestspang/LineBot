@@ -320,15 +320,19 @@ def handle_message(event):
         return 0
 
     if 'ทดลอง' in words_list or 'test' in words_list:
-        price = 'นี้คือระบบ test : '
-        textn = text.replace('ทดลอง ', '').replace('test ', '')
-        project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
-        fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-        response_text = fulfillment_text
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text))
-        return 0
+        if 'ทดลอง ' in text or 'test ' in text:
+            price = 'นี้คือระบบ test : '
+            textn = text.replace('ทดลอง ', '').replace('test ', '')
+            project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+            try:
+                fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
+            except:
+                fulfillment_text = "ระบบผิดพลาด"
+            response_text = fulfillment_text
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=response_text))
+            return 0
 
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
