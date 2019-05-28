@@ -328,6 +328,7 @@ def handle_message(event):
                 fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
             except:
                 fulfillment_text = "ระบบผิดพลาด"
+                pass
             response_text = fulfillment_text
             line_bot_api.reply_message(
                 event.reply_token,
