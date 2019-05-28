@@ -321,16 +321,12 @@ def handle_message(event):
     if 'ทดลอง' in words_list or 'test' in words_list:
         price = 'นี้คือระบบ test : '
         textn = text.replace('ทดลอง ', '').replace('test ', '')
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price + textn))
         os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
-        print("TEST: ",os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
+        #print("TEST: ",os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
         fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
         response_text = fulfillment_text
-        print("TEST: " + response_text)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text))
