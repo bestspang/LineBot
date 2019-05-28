@@ -42,6 +42,7 @@ def make_static_tmp_dir():
             raise
 
 def detect_intent_texts(project_id, session_id, text, language_code):
+    import dialogflow_v2 as dialogflow
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
 
