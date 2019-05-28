@@ -315,11 +315,11 @@ def handle_message(event):
         return 0
 
     if 'ทดลอง' in words_list or 'test' in words_list:
-        price = 'นี้คือระบบ test ครับ'
+        price = 'นี้คือระบบ test : '
         textn = text.replace('ทดลอง ', '').replace('test ', '')
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text=price))
+            TextSendMessage(text=price + textn))
         print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
         os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./path_to.json"
         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
