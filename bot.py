@@ -30,8 +30,9 @@ app = Flask(__name__)
 line_bot_api = LineBotApi('Z7FgW5zgSO1G9BaHiMJOCKTByoH6Fl9gFIam59JdkfVXaavM8k8DEsEfLZpWmBlNDbWv/q4wYA0mY/gJWLfNUBFX8yNp+5A5THgSjLzx6DTLVi5x69Ejbd1JRLBOtiS7/HoOmKHJDvmmlDEt2DXj1QdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
-
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
 def make_static_tmp_dir():
     try:
@@ -321,9 +322,6 @@ def handle_message(event):
     if 'ทดลอง' in words_list or 'test' in words_list:
         price = 'นี้คือระบบ test : '
         textn = text.replace('ทดลอง ', '').replace('test ', '')
-        os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
-        #print("TEST: ",os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
         fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
         response_text = fulfillment_text
