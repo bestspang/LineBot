@@ -321,8 +321,8 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price + textn))
+        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-50ea5113d8ee.json"
         print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-        os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./path_to.json"
         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
         fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
         response_text = fulfillment_text
