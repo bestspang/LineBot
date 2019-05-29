@@ -478,7 +478,7 @@ def handle_message(event):
     elif 'ขอ' in words_list and ('ฟอร์ม' in words_list or 'แบบฟอร์ม' in words_list):
         buttons_template = ButtonsTemplate(
             title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
-                URIAction(label='ใบลา', uri='https://forms.gle/wjE4tsFsVSGKcnH26'),
+                URIAction(label='ใบลา', uri='https://forms.gle/hnrN52QHrwdMZwBy6'),
                 URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
                 URIAction(label='ใบเบิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
                 URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8')
