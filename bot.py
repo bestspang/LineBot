@@ -307,7 +307,7 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
-        name = ["เบสท์", "แทน", "ทีม", "สนุ๊ก"]
+        name = ["best", "แทน", "ทีม", "snook"]
         usern = None
         for i in words_list:
             if i in name:
