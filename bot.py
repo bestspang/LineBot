@@ -306,6 +306,32 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
+    if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
+        name = ["BEST", "TAAN", "TEAM", "SNOOK"]
+        usern = None
+        for i in words_list:
+            if i in name:
+                usern = i
+        if usern = None:
+            price = "กรุณาบอกชื่อด้วยครับ"
+        else:
+            scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+            creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+            client = gspread.authorize(creds)
+            sheet = client.open('AbbokIncomeAssesmentV02').get_worksheet(2)
+            pp = pprint.PrettyPrinter()
+            name = ["BEST", "TAAN", "TEAM", "SNOOK"]
+            num = name.index('TAAN')
+            balance = sheet.cell(num+2, 9).value
+            #pp.pprint(balance)
+            price = "เงินเดือนของ {} จะได้รับในเดือนนี้ {} บาทครับผม!".format(usern, balance)
+
+        usern = None
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
     if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
         line_bot_api.reply_message(event.reply_token,
             TextSendMessage(text='Most Active Value'))
