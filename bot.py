@@ -312,7 +312,7 @@ def handle_message(event):
         for i in words_list:
             if i in name:
                 usern = i
-        if usern = None:
+        if usern == None:
             price = "กรุณาบอกชื่อด้วยครับ"
         else:
             scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
