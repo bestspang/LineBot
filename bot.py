@@ -1,7 +1,8 @@
 from flask import Flask, request, abort, send_from_directory, jsonify, render_template
 #from google.oauth2.service_account import Credentials
+from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, tempfile
-import dialogflow, pusher
+import dialogflow, gspread, pprint
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize, isthai
@@ -286,6 +287,20 @@ def handle_message(event):
             else:
                 price = ('ขณะนี้{} เมื่อวันที่ {} เวลา {} โดยคุณ{} ที่จังหวัด{}'.format(np[0][2], np[0][0], np[0][1], np[0][3], np[0][5]))
 
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
+    if 'ขอ' in words_list and ('balance' in words_list or 'ยอดเงิน' in words_list):
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        client = gspread.authorize(creds)
+        sheet = client.open('AbbokIncomeAssesmentV02').sheet1
+        pp = pprint.PrettyPrinter()
+        balance = sheet.cell(23, 2).value
+        #pp.pprint(balance)
+        price = "ยอดเงินในบัญชีตอนนี้มีทั้งหมด {} บาทครับผม!".format(balance)
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
