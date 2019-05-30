@@ -307,7 +307,7 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
-        name = ["BEST", "TAAN", "TEAM", "SNOOK"]
+        name = ["เบสท์", "แทน", "ทีม", "สนุ๊ก"]
         usern = None
         for i in words_list:
             if i in name:
@@ -320,8 +320,7 @@ def handle_message(event):
             client = gspread.authorize(creds)
             sheet = client.open('AbbokIncomeAssesmentV02').get_worksheet(2)
             pp = pprint.PrettyPrinter()
-            name = ["BEST", "TAAN", "TEAM", "SNOOK"]
-            num = name.index('TAAN')
+            num = name.index(usern)
             balance = sheet.cell(num+2, 9).value
             #pp.pprint(balance)
             price = "เงินเดือนของ {} จะได้รับในเดือนนี้ {} บาทครับผม!".format(usern, balance)
