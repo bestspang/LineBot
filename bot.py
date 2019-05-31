@@ -312,7 +312,10 @@ def handle_message(event):
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
         creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
         client = gspread.authorize(creds)
-        uRet(urls, "image.png")
+        headers = requests.utils.default_headers()
+        headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
+        #site_request = requests.get(url, headers=headers)
+        uRet(urls, "image.png", headers=headers)
         sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
         pp = pprint.PrettyPrinter()
         expense = sheet.cell(3, 14).value
