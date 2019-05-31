@@ -317,14 +317,14 @@ def handle_message(event):
         #site_request = requests.get(url, headers=headers)
         uRet(urls, "static/image.png")
         sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
-        pp = pprint.PrettyPrinter()
+        #pp = pprint.PrettyPrinter()
         expense = sheet.cell(3, 14).value
         income = sheet.cell(2, 14).value
 
         #pp.pprint(balance)
         price = "รายจ่ายทั้งหมด {} บาท\nรายรับทั้งหมด {} บาท".format(expense, income)
 
-        url = request.url_root + '/image.png'
+        url = request.url_root + '/static/image.png'
         app.logger.info("url=" + url)
         line_bot_api.reply_message(
             event.reply_token,
