@@ -315,18 +315,20 @@ def handle_message(event):
         uRet(urls, "image.png")
         sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
         pp = pprint.PrettyPrinter()
-        expense = sheet.cell(14, 3).value
-        income = sheet.cell(14, 2).value
+        expense = sheet.cell(3, 14).value
+        income = sheet.cell(2, 14).value
 
         #pp.pprint(balance)
-        price = "ค่าใช้จ่ายทั้งหมด {} บาท \n รายรับทั้งหมด {} บาท".format(expense, income)
+        price = "รายจ่ายทั้งหมด {} บาท \n รายรับทั้งหมด {} บาท".format(expense, income)
 
         url = request.url_root + '/image.png'
         app.logger.info("url=" + url)
         line_bot_api.reply_message(
             event.reply_token,
+            [
             ImageSendMessage(url, url),
             TextSendMessage(text=price)
+            ]
         )
 
         return 0
