@@ -34,7 +34,7 @@ expense = sheet.cell(3, 14).value
 income = sheet.cell(2, 14).value
 
 #pp.pprint(balance)
-price = "ค่าใช้จ่ายทั้งหมด {} บาท \n รายรับทั้งหมด {} บาท".format(expense, income)
+price = "รายจ่ายทั้งหมด {} บาท \n รายรับทั้งหมด {} บาท".format(expense, income)
 print(price)
 #url = request.url_root + '/image.png'
 #app.logger.info("url=" + url)

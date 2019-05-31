@@ -315,7 +315,7 @@ def handle_message(event):
         headers = requests.utils.default_headers()
         headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
         #site_request = requests.get(url, headers=headers)
-        uRet(urls, "image.png", headers=headers)
+        uRet(urls, "image.png")
         sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
         pp = pprint.PrettyPrinter()
         expense = sheet.cell(3, 14).value
