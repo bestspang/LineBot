@@ -9,6 +9,7 @@ from pythainlp.tokenize import word_tokenize, isthai
 from bs4 import BeautifulSoup as soup
 from html.parser import HTMLParser
 from urllib.request import urlopen as uReq
+from urllib.request import urlretrieve as uRet
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import (MessageEvent, TextMessage, TextSendMessage,
@@ -306,6 +307,30 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
+    if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
+        urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        client = gspread.authorize(creds)
+        uRet(urls, "image.png")
+        sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
+        pp = pprint.PrettyPrinter()
+        expense = sheet.cell(14, 3).value
+        income = sheet.cell(14, 2).value
+
+        #pp.pprint(balance)
+        price = "ค่าใช้จ่ายทั้งหมด {} บาท \n รายรับทั้งหมด {} บาท".format(expense, income)
+
+        url = request.url_root + '/image.png'
+        app.logger.info("url=" + url)
+        line_bot_api.reply_message(
+            event.reply_token,
+            ImageSendMessage(url, url),
+            TextSendMessage(text=price)
+        )
+
+        return 0
+
     if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
         name = ["best", "แทน", "ทีม", "snook"]
         usern = None
@@ -342,6 +367,8 @@ def handle_message(event):
         # row = ["I'm","inserting","a","new","row","into","a,","Spreadsheet","using","Python"]
         # index = 3
         # sheet.insert_row(row, index)
+        # sheet.row_count
+        # sheet.delete_row(1)
         balance = sheet.cell(1, 1).value
         price = "เปลี่ยนข้อมูลเป็น : {} ".format(balance)
 
