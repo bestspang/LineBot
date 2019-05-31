@@ -339,8 +339,11 @@ def handle_message(event):
         sheet = client.open('testSpreadsheet').sheet1
         pp = pprint.PrettyPrinter()
         sheet.update_cell(1, 1, newdata)
+        # row = ["I'm","inserting","a","new","row","into","a,","Spreadsheet","using","Python"]
+        # index = 3
+        # sheet.insert_row(row, index)
         balance = sheet.cell(1, 1).value
-        price = "เปลี่ยนข้อมูลเป็น {} !".format(balance)
+        price = "เปลี่ยนข้อมูลเป็น : {} ".format(balance)
 
         line_bot_api.reply_message(
             event.reply_token,
