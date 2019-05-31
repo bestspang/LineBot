@@ -331,6 +331,22 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
+    if ('เพิิ่ม' in words_list or 'add' in words_list) and ('ข้อมูล' in words_list or 'data' in words_list):
+        newdata = text.split(' ')[-1]
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        client = gspread.authorize(creds)
+        sheet = client.open('testSpreadsheet').sheet1
+        pp = pprint.PrettyPrinter()
+        sheet.update_cell(1, 1, newdata)
+        balance = sheet.cell(1, 1).value
+        price = "เปลี่ยนข้อมูลเป็น {} !".format(balance)
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
     if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
         line_bot_api.reply_message(event.reply_token,
             TextSendMessage(text='Most Active Value'))
