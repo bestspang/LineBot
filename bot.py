@@ -35,7 +35,7 @@ def is_member(input):
         pp = pprint.PrettyPrinter()
         user_id = sheet.col_values(3)[1:]
         if input in user_id:
-            sheet.col_values(4)[1:][user_id.index(input)]
+            #sheet.col_values(4)[1:][user_id.index(input)]
             return True
         else:
             return False
@@ -950,7 +950,7 @@ def handle_postback(event):
 
     elif event.postback.data == 'yes':
         txt = 'ใจเย็นๆโฮ่ง!\nส่งข้อมูลไปแล้วจ้า!'
-        if not is_member:
+        if not is_member(event.source.user_id):
             add_member(event.source.user_id)
             txt = 'บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'
         line_bot_api.reply_message(
