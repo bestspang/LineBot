@@ -10,6 +10,8 @@ sheet = client.open('lineUser').worksheet('user')
 pp = pprint.PrettyPrinter()
 user_id = sheet.col_values(3)[1:]
 isApprove = sheet.col_values(4)[1:][0] == "APPROVE"
+a= [1,2]
+print(len(a))
 print(sheet.col_values(4)[1:][0])
 print(user_id)
 print(isApprove)

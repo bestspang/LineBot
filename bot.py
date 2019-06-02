@@ -56,9 +56,9 @@ def add_member(input):
         sheet = client.open('lineUser').worksheet('user')
         profile = line_bot_api.get_profile(input)
         now = datetime.datetime.now()
-        row = [profile.display_name, input, "", now.strftime('%Y/%m/%d'),"4"]
-        index = sheet.row_count() + 1
-        profile.display_name
+        row_num = len(sheet.col_values(3)[1:])
+        row = [row_num + 1,profile.display_name, input, "", now.strftime('%Y/%m/%d'),"4"]
+        index = row_num + 1
         sheet.insert_row(row, index)
 
 def make_static_tmp_dir():
