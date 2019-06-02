@@ -539,8 +539,7 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, [
                     TextSendMessage(text='Hello! ' + profile.display_name),
                     TextSendMessage(text=member),
-                    template_message,
-                    timeout=None
+                    template_message
                 ])
                 print(event.message.text.lower())
 
