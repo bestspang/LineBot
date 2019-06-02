@@ -60,6 +60,8 @@ def add_member(input):
         row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
         index = row_num + 2
         sheet.insert_row(row, index)
+        to = "C374667ff440b48857dafb57606ff4600"
+        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิิก!'))
 
 def make_static_tmp_dir():
     try:
