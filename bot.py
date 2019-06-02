@@ -15,11 +15,14 @@ from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 
 app = Flask(__name__)
+config = configparser.ConfigParser()
+config.read("config.ini")
 
-line_bot_api = LineBotApi('Z7FgW5zgSO1G9BaHiMJOCKTByoH6Fl9gFIam59JdkfVXaavM8k8DEsEfLZpWmBlNDbWv/q4wYA0mY/gJWLfNUBFX8yNp+5A5THgSjLzx6DTLVi5x69Ejbd1JRLBOtiS7/HoOmKHJDvmmlDEt2DXj1QdB04t89/1O/w1cDnyilFU=')
-handler = WebhookHandler('1b8e881368efe90738ce5c3341898c35')
+line_bot_api = LineBotApi(config['line_bot']['line_bot_api'])
+handler = WebhookHandler(config['line_bot']['handler'])
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
+
 os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
