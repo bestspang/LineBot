@@ -631,7 +631,7 @@ def handle_message(event):
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
-                url='https://example.com/cafe.jpg',
+                url=request.url_root + '/images/shopFront.jpg',
                 size='full',
                 aspect_ratio='20:13',
                 aspect_mode='cover',
@@ -641,18 +641,18 @@ def handle_message(event):
                 layout='vertical',
                 contents=[
                     # title
-                    TextComponent(text='Brown Cafe', weight='bold', size='xl'),
+                    TextComponent(text='ABBOK Office', weight='bold', size='xl'),
                     # review
                     BoxComponent(
                         layout='baseline',
                         margin='md',
                         contents=[
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            TextComponent(text='4.0', size='sm', color='#999999', margin='md',
+                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                            #IconComponent(size='sm', url='https://example.com/grey_star.png'),
+                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
+                            #IconComponent(size='sm', url='https://example.com/grey_star.png'),
+                            TextComponent(text='Design and Technology', size='sm', color='#999999', margin='md',
                                           flex=0)
                         ]
                     ),
@@ -673,7 +673,7 @@ def handle_message(event):
                                         flex=1
                                     ),
                                     TextComponent(
-                                        text='Shinjuku, Tokyo',
+                                        text='สวนหลวงสแควร์ ซอยจุฬาฯ 5 ถนนพระราม 1, กทมฯ',
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
@@ -692,7 +692,7 @@ def handle_message(event):
                                         flex=1
                                     ),
                                     TextComponent(
-                                        text="10:00 - 23:00",
+                                        text="10:00 - 18:00",
                                         wrap=True,
                                         color='#666666',
                                         size='sm',
@@ -714,7 +714,7 @@ def handle_message(event):
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='CALL', uri='tel:000000'),
+                        action=URIAction(label='CALL', uri='tel:0912501735'),
                     ),
                     # separator
                     SeparatorComponent(),
@@ -722,12 +722,12 @@ def handle_message(event):
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://example.com")
+                        action=URIAction(label='WEBSITE', uri="https://abbok.net")
                     )
                 ]
             ),
         )
-        message = FlexSendMessage(alt_text="hello", contents=bubble)
+        message = FlexSendMessage(alt_text="Abbok's Infomation", contents=bubble)
         line_bot_api.reply_message(
             event.reply_token,
             message
