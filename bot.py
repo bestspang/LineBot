@@ -57,7 +57,7 @@ def add_member(input):
         profile = line_bot_api.get_profile(input)
         now = datetime.datetime.now()
         row_num = len(sheet.col_values(3)[1:])
-        row = [row_num + 1,profile.display_name, input, "", now.strftime('%Y/%m/%d'),"4"]
+        row = [row_num + 1,profile.display_name, input, "", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
         index = row_num + 2
         sheet.insert_row(row, index)
 
