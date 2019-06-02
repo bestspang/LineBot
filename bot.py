@@ -618,7 +618,7 @@ def handle_message(event):
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
-                thumbnail_image_url=request.url_root + '/images/shopFront.jpg',
+                url=request.url_root + '/images/shopFront.jpg',
                 size='full',
                 aspect_ratio='20:13',
                 aspect_mode='cover',
