@@ -1,7 +1,7 @@
 from flask import Flask, request, abort, send_from_directory, jsonify, render_template
 #from google.oauth2.service_account import Credentials
 from oauth2client.service_account import ServiceAccountCredentials
-import json, requests, random, os, errno, sys, tempfile
+import json, requests, random, os, errno, sys, tempfile, configparser
 import dialogflow, gspread, pprint
 import numpy as np
 import pandas as pd
@@ -12,20 +12,7 @@ from urllib.request import urlopen as uReq
 from urllib.request import urlretrieve as uRet
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
-from linebot.models import (MessageEvent, TextMessage, TextSendMessage,
-    SourceUser, SourceGroup, SourceRoom,
-    TemplateSendMessage, ConfirmTemplate, MessageAction,
-    ButtonsTemplate, ImageCarouselTemplate, ImageCarouselColumn, URIAction,
-    PostbackAction, DatetimePickerAction,
-    CameraAction, CameraRollAction, LocationAction,
-    CarouselTemplate, CarouselColumn, PostbackEvent,
-    StickerMessage, StickerSendMessage, LocationMessage, LocationSendMessage,
-    ImageMessage, VideoMessage, AudioMessage, FileMessage,
-    UnfollowEvent, FollowEvent, JoinEvent, LeaveEvent, BeaconEvent,
-    FlexSendMessage, BubbleContainer, ImageComponent, BoxComponent,
-    TextComponent, SpacerComponent, IconComponent, ButtonComponent,
-    SeparatorComponent, QuickReply, QuickReplyButton,
-    ImageSendMessage)
+from linebot.models import *
 
 app = Flask(__name__)
 
@@ -631,11 +618,11 @@ def handle_message(event):
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
-                url=request.url_root + '/images/shopFront.jpg',
+                thumbnail_image_url=request.url_root + '/images/shopFront.jpg',
                 size='full',
                 aspect_ratio='20:13',
                 aspect_mode='cover',
-                action=URIAction(uri='http://example.com', label='label')
+                action=URIAction(uri='https://www.abbok.net', label='label')
             ),
             body=BoxComponent(
                 layout='vertical',
@@ -722,7 +709,7 @@ def handle_message(event):
                     ButtonComponent(
                         style='link',
                         height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://abbok.net")
+                        action=URIAction(label='WEBSITE', uri="https://www.abbok.net")
                     )
                 ]
             ),
