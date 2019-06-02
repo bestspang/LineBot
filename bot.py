@@ -77,7 +77,7 @@ def send_static_content(path):
     return send_from_directory('static', path)
 
 @app.route('/images/<path:path>')
-def send_static_content(path):
+def send_images_content(path):
     return send_from_directory('images', path)
 # @app.route('/get_movie_detail', methods=['POST'])
 #     def get_movie_detail():
