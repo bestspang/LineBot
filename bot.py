@@ -26,6 +26,32 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+client = gspread.authorize(creds)
+
+def is_member(input):
+        sheet = client.open('lineUser').worksheet('user')
+        pp = pprint.PrettyPrinter()
+        user_id = sheet.col_values(3)[1:]
+        if input in user_id:
+            sheet.col_values(4)[1:][user_id.index(input)]
+            return True
+        else:
+            return False
+        #pp.pprint(balance)
+        #sheet = client.open('testSpreadsheet').sheet1
+        #pp = pprint.PrettyPrinter()
+        #sheet.update_cell(1, 1, newdata)
+
+def is_approve(input):
+        sheet = client.open('lineUser').worksheet('user')
+        user_id = sheet.col_values(3)[1:]
+        if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
+            return True
+        else:
+            return False
+
 def make_static_tmp_dir():
     try:
         os.makedirs(static_tmp_path)
@@ -472,6 +498,48 @@ def handle_message(event):
                 ]
             )
 
+    if text == 'member':
+        if isinstance(event.source, SourceUser):
+            profile = line_bot_api.get_profile(event.source.user_id)
+            member = "You are not a member!"
+            if is_member(event.source.user_id) and is_approve(event.source.user_id):
+                member = "You are a member!"
+                line_bot_api.reply_message(
+                    event.reply_token, [
+                        TextSendMessage(text='Hello! ' + profile.display_name),
+                        TextSendMessage(text=member)
+                    ]
+                )
+            elif is_member(event.source.user_id) and not is_approve(event.source.user_id):
+                member = "your application is waiting to be approve!\nplease wait!"
+                line_bot_api.reply_message(
+                    event.reply_token, [
+                        TextSendMessage(text='Hello! ' + profile.display_name),
+                        TextSendMessage(text=member)
+                    ]
+                )
+            else:
+                confirm_template = ConfirmTemplate(text='ต้องการสมัครสมาชิกหรือไหม?', actions=[
+                    MessageAction(label='Yes', text='Yes!'),
+                    MessageAction(label='No', text='No!'),
+                ])
+                template_message = TemplateSendMessage(
+                    alt_text='Confirm alt text', template=confirm_template)
+                line_bot_api.reply_message(event.reply_token, [
+                    TextSendMessage(text='Hello! ' + profile.display_name),
+                    TextSendMessage(text=member),
+                    template_message
+                ])
+
+        elif isinstance(event.source, SourceGroup):
+            #member_ids_res = line_bot_api.get_group_member_ids(event.source.group_id)
+            line_bot_api.reply_message(
+                event.reply_token, [
+                    TextSendMessage(text="Bot is in a Group!"),
+                    TextSendMessage(text='Group id: ' + event.source.group_id),
+                    #TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
+                ]
+            )
 
     elif text == 'quota':
         quota = line_bot_api.get_message_quota()
