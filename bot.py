@@ -949,9 +949,12 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text=event.postback.params['date']))
 
     elif event.postback.data == 'yes':
-        add_member(event.source.user_id)
+        txt = 'ใจเย็นๆโฮ่ง!\nส่งข้อมูลไปแล้วจ้า!'
+        if not is_member:
+            add_member(event.source.user_id)
+            txt = 'บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text='บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'))
+            event.reply_token, TextSendMessage(text=txt))
     elif event.postback.data == 'no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
