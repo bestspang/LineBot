@@ -2,7 +2,7 @@ from flask import Flask, request, abort, send_from_directory, jsonify, render_te
 #from google.oauth2.service_account import Credentials
 from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, tempfile, configparser
-import dialogflow, gspread, pprint
+import dialogflow, gspread, pprint, datetime
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize, isthai
@@ -51,6 +51,15 @@ def is_approve(input):
             return True
         else:
             return False
+
+def add_member(input):
+        sheet = client.open('lineUser').worksheet('user')
+        profile = line_bot_api.get_profile(input)
+        now = datetime.datetime.now()
+        row = [profile.display_name, input, "", now.strftime('%Y/%m/%d'),"4"]
+        index = sheet.row_count() + 1
+        profile.display_name
+        sheet.insert_row(row, index)
 
 def make_static_tmp_dir():
     try:
@@ -520,6 +529,8 @@ def handle_message(event):
                 )
             else:
                 confirm_template = ConfirmTemplate(text='ต้องการสมัครสมาชิกหรือไหม?', actions=[
+                    #PostbackAction(label='postback',text='postback text',data='action=buy&itemid=1'),
+                    #PostbackAction(label='postback',text='postback text',data='action=buy&itemid=1'),
                     MessageAction(label='Yes', text='Yes!'),
                     MessageAction(label='No', text='No!'),
                 ])
@@ -528,8 +539,10 @@ def handle_message(event):
                 line_bot_api.reply_message(event.reply_token, [
                     TextSendMessage(text='Hello! ' + profile.display_name),
                     TextSendMessage(text=member),
-                    template_message
+                    template_message,
+                    timeout=None
                 ])
+                print(event.message.text.lower())
 
         elif isinstance(event.source, SourceGroup):
             #member_ids_res = line_bot_api.get_group_member_ids(event.source.group_id)
