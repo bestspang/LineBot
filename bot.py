@@ -7,7 +7,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, tempfile, configparser
 import dialogflow, gspread, pprint, datetime, math
 from time import sleep
-from threading import Thread, Event
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize, isthai
@@ -18,6 +17,7 @@ from urllib.request import urlretrieve as uRet
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
+from threading import Thread, Event
 
 __author__ = 'bestspang'
 
