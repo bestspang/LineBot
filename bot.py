@@ -529,10 +529,10 @@ def handle_message(event):
                 )
             else:
                 confirm_template = ConfirmTemplate(text='ต้องการสมัครสมาชิกหรือไหม?', actions=[
-                    #PostbackAction(label='postback',text='postback text',data='action=buy&itemid=1'),
-                    #PostbackAction(label='postback',text='postback text',data='action=buy&itemid=1'),
-                    MessageAction(label='Yes', text='Yes!'),
-                    MessageAction(label='No', text='No!'),
+                    PostbackAction(label='Yes',text='Yes!',data='yes'),
+                    PostbackAction(label='No',text='No!',data='no'),
+                    #MessageAction(label='Yes', text='Yes!'),
+                    #MessageAction(label='No', text='No!'),
                 ])
                 template_message = TemplateSendMessage(
                     alt_text='Confirm alt text', template=confirm_template)
@@ -946,7 +946,15 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text=event.postback.params['datetime']))
     elif event.postback.data == 'date_postback':
         line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=event.postback.params['date']))
+            event.reply_token, TextSendMessage(text=event.postback.params['date
+
+    elif event.postback.data == 'yes':
+        add_member(event.source.user_id)
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'))
+    elif event.postback.data == 'no':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
 
 @handler.add(BeaconEvent)
