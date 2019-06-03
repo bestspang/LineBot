@@ -549,7 +549,6 @@ def handle_message(event):
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว!"
-        response_text = fulfillment_text
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text))
