@@ -1,11 +1,11 @@
 import gevent.monkey
 gevent.monkey.patch_all()
 from flask_socketio import SocketIO, emit
-from flask import Flask, request, abort, send_from_directory, jsonify, render_template, url_for, copy_current_request_context
-#from google.oauth2.service_account import Credentials
+from flask import Flask, request, abort, send_from_directory, jsonify,
+render_template, url_for, copy_current_request_context
 from oauth2client.service_account import ServiceAccountCredentials
-import json, requests, random, os, errno, sys, tempfile, configparser
-import dialogflow, gspread, pprint, datetime, math
+import json, requests, random, os, errno, sys, configparser
+import dialogflow, gspread, pprint, datetime, math #tempfile
 from time import sleep
 import numpy as np
 import pandas as pd
