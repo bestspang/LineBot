@@ -2,8 +2,7 @@ import gevent.monkey
 gevent.monkey.patch_all()
 from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
-from flask import Flask, request, abort, send_from_directory, jsonify,
-render_template, url_for, copy_current_request_context
+from flask import Flask, request, abort, send_from_directory, jsonify, render_template, url_for, copy_current_request_context
 from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, configparser
 import dialogflow, gspread, pprint, datetime, math #tempfile
