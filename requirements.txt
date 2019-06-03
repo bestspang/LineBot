@@ -14,14 +14,11 @@ configparser==3.5.0
 cryptography==2.6.1
 dialogflow==0.4.0
 dill==0.2.8.2
-Django==2.2.1
 firebase-admin==2.17.0
 Flask==1.0.2
 Flask-SocketIO==4.0.0
 future==0.16.0
 gevent==1.4.0
-gevent-socketio==0.3.6
-gevent-websocket==0.10.1
 google-api-core==1.11.0
 google-api-python-client==1.7.9
 google-auth==1.5.0
