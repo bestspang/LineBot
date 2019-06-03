@@ -537,7 +537,7 @@ def handle_message(event):
 
     if 'check' in words_list or 'checkin' in words_list:
         rank = member_rank(event.source.user_id)
-        response_text = "รหัส(code) ไม่ถูกต้องครับ!"
+        response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "04":
             if 'check ' in text or 'checkin ' in text:
                 price = 'นี้คือระบบ test : '
@@ -545,6 +545,8 @@ def handle_message(event):
                 if check_opt(textn, number):
                     checkin_out(event.source.user_id,"in")
                     response_text = "Check in สำเร็จแล้วครับ!"
+                else:
+                    response_text = "รหัสที่คุณป้อน "+ textn +"รหัสที่ถูก "+number
             else:
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
         else:
