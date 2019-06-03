@@ -33,7 +33,7 @@ thread = Thread()
 thread_stop_event = Event()
 
 class RandomThread(Thread):
-    def __init__(self, number):
+    def __init__(self):
         self.delay = 15
         self.otp = ""
         super(RandomThread, self).__init__()
@@ -542,7 +542,7 @@ def handle_message(event):
             if 'check ' in text or 'checkin ' in text:
                 price = 'นี้คือระบบ test : '
                 textn = text.replace('checkin ', '').replace('check ', '')
-                #thread = RandomThread()
+                #thread = RandomTh__init__()read()
                 number = thread.otp
                 if check_opt(textn, number):
                     checkin_out(event.source.user_id,"in")
