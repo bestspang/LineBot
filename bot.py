@@ -543,11 +543,11 @@ def handle_message(event):
                 textn = text.replace('checkin ', '').replace('check ', '')
                 #thread = RandomTh__init__()read()
                 number = os.getenv('OTP_BACKUP')
-                if check_opt(textn, number):
+                if check_opt(textn, number) and textn is not None:
                     checkin_out(event.source.user_id,"in")
                     response_text = "Check in สำเร็จแล้วครับ!"
                 else:
-                    response_text = "รหัสที่คุณป้อน "+ textn +"รหัสที่ถูก "+number
+                    response_text = "รหัสที่คุณป้อน "+ textn +"รหัสที่ถูก "+ number
             else:
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
         else:
