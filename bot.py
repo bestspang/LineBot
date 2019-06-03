@@ -31,7 +31,7 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
-number = ""
+number = "000000"
 
 class RandomThread(Thread):
     def __init__(self):
