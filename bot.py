@@ -34,7 +34,7 @@ thread_stop_event = Event()
 
 class RandomThread(Thread):
     def __init__(self):
-        self.delay = 15
+        self.delay = 25
         self.otp = ""
         super(RandomThread, self).__init__()
 
@@ -50,7 +50,7 @@ class RandomThread(Thread):
             number = ""
             for i in range(6):
                 number += digits[math.floor(random.random() * 10)]
-            self.otp = number
+            os.environ["OTP_BACKUP"]=number
             print(number)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
             sleep(self.delay)
@@ -540,10 +540,9 @@ def handle_message(event):
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "04":
             if 'check ' in text or 'checkin ' in text:
-                price = 'นี้คือระบบ test : '
                 textn = text.replace('checkin ', '').replace('check ', '')
                 #thread = RandomTh__init__()read()
-                number = thread.otp
+                number = os.getenv('OTP_BACKUP')
                 if check_opt(textn, number):
                     checkin_out(event.source.user_id,"in")
                     response_text = "Check in สำเร็จแล้วครับ!"
