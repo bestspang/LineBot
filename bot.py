@@ -31,11 +31,11 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
-number = "000000"
 
 class RandomThread(Thread):
-    def __init__(self):
+    def __init__(self, number):
         self.delay = 15
+        self.otp = ""
         super(RandomThread, self).__init__()
 
     def randomNumberGenerator(self):
@@ -46,11 +46,11 @@ class RandomThread(Thread):
         #infinite loop of magical random numbers
         print("Making random numbers")
         while not thread_stop_event.isSet():
-            global number
             digits = "0123456789"
             number = ""
             for i in range(6):
                 number += digits[math.floor(random.random() * 10)]
+            self.otp = number
             print(number)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
             sleep(self.delay)
@@ -542,6 +542,8 @@ def handle_message(event):
             if 'check ' in text or 'checkin ' in text:
                 price = 'นี้คือระบบ test : '
                 textn = text.replace('checkin ', '').replace('check ', '')
+                #thread = RandomThread()
+                number = thread.otp
                 if check_opt(textn, number):
                     checkin_out(event.source.user_id,"in")
                     response_text = "Check in สำเร็จแล้วครับ!"

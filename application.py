@@ -21,11 +21,11 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
-#number = ""
 
 class RandomThread(Thread):
     def __init__(self):
         self.delay = 15
+        self.otp = ""
         super(RandomThread, self).__init__()
 
     def randomNumberGenerator(self):
@@ -40,6 +40,7 @@ class RandomThread(Thread):
             number = ""
             for i in range(6):
                 number += digits[math.floor(random() * 10)]
+            self.otp = number
             print(number)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
             sleep(self.delay)
