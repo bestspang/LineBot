@@ -21,6 +21,7 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
+#number = ""
 
 class RandomThread(Thread):
     def __init__(self):

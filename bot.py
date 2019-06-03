@@ -31,6 +31,7 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
+number = ""
 
 class RandomThread(Thread):
     def __init__(self):
@@ -45,6 +46,7 @@ class RandomThread(Thread):
         #infinite loop of magical random numbers
         print("Making random numbers")
         while not thread_stop_event.isSet():
+            global number
             digits = "0123456789"
             number = ""
             for i in range(6):
@@ -70,6 +72,24 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
 client = gspread.authorize(creds)
+
+def check_opt(input, opt):
+    if input == opt:
+        return True
+    else:
+        return False
+
+def checkin_out(input_id, type):
+    pass
+
+def member_rank(input):
+    if is_member(input) and is_approve(input):
+        sheet = client.open('lineUser').worksheet('user')
+        user_id = sheet.col_values(3)[1:]
+        return sheet.col_values(6)[1:][user_id.index(input)]
+    else:
+        return False
+
 
 def is_member(input):
         sheet = client.open('lineUser').worksheet('user')
@@ -341,6 +361,7 @@ def is_number(s):
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    global number
     text = event.message.text.lower()
     words_list = extractWord(event.message.text)
     if 'หุ้น' in words_list or 'ราคา' in words_list:
@@ -514,6 +535,27 @@ def handle_message(event):
                 TextSendMessage(text=response_text))
             return 0
 
+    if 'check' in words_list or 'checkin' in words_list:
+        rank = member_rank(event.source.user_id)
+        response_text = "รหัส(code) ไม่ถูกต้องครับ!"
+        if rank in "04":
+            if 'check ' in text or 'checkin ' in text:
+                price = 'นี้คือระบบ test : '
+                textn = text.replace('checkin ', '').replace('check ', '')
+                if check_opt(textn, number):
+                    checkin_out(event.source.user_id,"in")
+                    response_text = "Check in สำเร็จแล้วครับ!"
+            else:
+                response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
+        else:
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว!"
+        response_text = fulfillment_text
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
+        return 0
+
+
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
         texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
@@ -521,6 +563,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=texts[random.randint(0,7)]))
         return 0
+
     if 'บุ๊ค' in words_list or 'book' in words_list or 'บุ๊ก' in words_list:
         texts = ['ตูดหมึก', 'จังกะเป', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กแว๊น', 'กิ๊บป่อง', 'ผีบ้า']
         line_bot_api.reply_message(
