@@ -538,7 +538,7 @@ def handle_message(event):
     if 'check' in words_list or 'checkin' in words_list:
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
-        if rank in "04":
+        if rank in "01":
             if 'check ' in text or 'checkin ' in text:
                 textn = text.replace('checkin ', '').replace('check ', '')
                 #thread = RandomTh__init__()read()
@@ -551,7 +551,7 @@ def handle_message(event):
             else:
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
         else:
-            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว!"
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=response_text))
