@@ -557,6 +557,21 @@ def handle_message(event):
             TextSendMessage(text=response_text))
         return 0
 
+    if 'cast' in words_list or 'castto' in words_list:
+        rank = member_rank(event.source.user_id)
+        if rank in "0":
+            if 'cast ' in text or 'castto ' in text:
+                textn = text.replace('checkin ', '').replace('check ', '')
+                to = "C374667ff440b48857dafb57606ff4600"
+                line_bot_api.push_message(to, TextSendMessage(text=textn))
+            else:
+                response_text = "กรุณาพิมพ์ cast หรือ castto\nตามด้วยประโยคที่ต้องการเผยแพร่!"
+        else:
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
+
+        return 0
+
+
 
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
