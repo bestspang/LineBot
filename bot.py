@@ -561,7 +561,7 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         if rank in "0":
             if 'cast ' in text or 'castto ' in text:
-                textn = text.replace('checkin ', '').replace('check ', '')
+                textn = text.replace('cast ', '').replace('castto ', '')
                 to = "C374667ff440b48857dafb57606ff4600"
                 line_bot_api.push_message(to, TextSendMessage(text=textn))
             else:
