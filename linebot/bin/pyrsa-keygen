@@ -1,5 +1,4 @@
-#!/Users/bestspang/Developer/LineBot/linebot/bin/python
-
+#!/Users/bestspang/Developer/LineBot/linebot/bin/python3.7
 # -*- coding: utf-8 -*-
 import re
 import sys

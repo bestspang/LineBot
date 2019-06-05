@@ -1,4 +1,4 @@
-#!/Users/bestspang/Developer/LineBot/linebot/bin/python
+#!/Users/bestspang/Developer/LineBot/linebot/bin/python3.7
 # See http://cens.ioc.ee/projects/f2py2e/
 from __future__ import division, print_function
 

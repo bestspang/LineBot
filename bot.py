@@ -9,7 +9,8 @@ import dialogflow, gspread, pprint, datetime, math #tempfile
 from time import sleep
 import numpy as np
 import pandas as pd
-from pythainlp.tokenize import word_tokenize, isthai
+from pythainlp.tokenize import word_tokenize
+from pythainlp.util import isthai
 from bs4 import BeautifulSoup as soup
 from html.parser import HTMLParser
 from urllib.request import urlopen as uReq
@@ -34,7 +35,7 @@ thread_stop_event = Event()
 
 class RandomThread(Thread):
     def __init__(self):
-        self.delay = 25
+        self.delay = 26
         self.otp = ""
         super(RandomThread, self).__init__()
 
@@ -45,18 +46,32 @@ class RandomThread(Thread):
         """
         #infinite loop of magical random numbers
         print("Making random numbers")
+        #while not thread_stop_event.isSet():
+        digits = "0123456789"
+        number = ""
+        for i in range(6):
+            number += digits[math.floor(random.random() * 10)]
+        os.environ["OTP_BACKUP"]=number
+        print(number)
+        socketio.emit('newnumber', {'number': number}, namespace='/test')
+        #sleep(self.delay)
+
+    def timeCountdown(self):
+        #infinite loop of magical random numbers
+        print("Counting down")
+        time = 0
         while not thread_stop_event.isSet():
-            digits = "0123456789"
-            number = ""
-            for i in range(6):
-                number += digits[math.floor(random.random() * 10)]
-            os.environ["OTP_BACKUP"]=number
-            print(number)
-            socketio.emit('newnumber', {'number': number}, namespace='/test')
-            sleep(self.delay)
+            if time <= 0:
+                time = self.delay
+                self.randomNumberGenerator()
+            time -= 1
+            print(time)
+            socketio.emit('newtime', {'time': time}, namespace='/test')
+            sleep(1)
 
     def run(self):
-        self.randomNumberGenerator()
+        #self.randomNumberGenerator()
+        self.timeCountdown()
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -306,7 +321,7 @@ def extractWord(text):
     return b
 
 def getSymbol(lists):
-    for i in range(len(lists)):
+    for i in range(len(lsts)):
         if isthai(lists[i])['thai'] == 0:
             return lists[i].upper()
     return 0
