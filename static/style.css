@@ -1,7 +1,7 @@
 @import url(https://fonts.googleapis.com/css?family=Kanit:100,200,400);
 body {
   background-color: #222;
-  font-size: 5em;
+  font-size: 3em;
   text-align: center;
   font-family: 'Kanit';
   font-weight: 100;
@@ -9,14 +9,22 @@ body {
   margin: 100px auto;
 }
 
+p {
+  font-size: 1.2em; /* 14px/16=0.875em */
+}
+
 p2 {
-  font-size: 2.5em; /* 14px/16=0.875em */
+  font-size: 0.8em; /* 14px/16=0.875em */
 }
 
 p3 {
-  font-size: 1em; /* 14px/16=0.875em */
+  font-size: 1.4em; /* 14px/16=0.875em */
+}
+
+p4 {
+  font-size: 0.5em; /* 14px/16=0.875em */
 }
 
 h1 {
-  font-size: 8em; /* 14px/16=0.875em */
+  font-size: 4em; /* 14px/16=0.875em */
 }
