@@ -32,6 +32,7 @@ if 'ใคร' in words_list and ('ทำงานอยู่' in words_list or
         text += 'กำลังทำงานครับผม!'
     else:
         text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+        
 
 print(text)
 #sheet.update_cell(1, 1, newdata)

@@ -334,7 +334,7 @@ def extractWord(text):
 
 def getSymbol(lists):
     for i in range(len(lists)):
-        if isthai(lists[i])['thai'] == 0:
+        if isthai(lists[i])['thai'] == 0: ### TO FIX TypeError: 'bool' object is not subscriptable
             return lists[i].upper()
     return 0
 
@@ -545,7 +545,7 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=quote))
         return 0
-
+#fix google dialogflow
     if 'ทดลอง' in words_list or 'test' in words_list:
         if 'ทดลอง ' in text or 'test ' in text:
             price = 'นี้คือระบบ test : '
@@ -562,6 +562,7 @@ def handle_message(event):
                 TextSendMessage(text=response_text))
         return 0
 
+#TODO : check is number
     if 'check' in words_list or 'checkin' in words_list:
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
@@ -596,7 +597,7 @@ def handle_message(event):
             TextSendMessage(text=response_text))
         return 0
 
-    if 'ใคร' in words_list and ('ทำงานอยู่' in words_list or 'อยู่ที่ทำงาน' in words_list):
+    if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
         sheet = client.open('userCheckin').worksheet('userStatus')
         user_name = sheet.col_values(3)[1:]
         text = ""
@@ -610,6 +611,7 @@ def handle_message(event):
             text += 'กำลังทำงานครับผม!'
         else:
             text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
@@ -632,7 +634,7 @@ def handle_message(event):
                     for i in range(len(is_in)):
                         if is_in[i] == 1:
                             text += "{} กำลังทำงาน\n".format(user_name[i])
-                        text += 'คร ับผม!'
+                        text += 'ครับผม!'
                 else:
                     text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
 
