@@ -116,8 +116,7 @@ def who_work():
     return text
 
 def checkin_out(input_id, type):
-    now = datetime.datetime.now()
-    ntime = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    now = datetime.datetime.now() #+ datetime.timedelta(seconds = time_in_seconds)
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]

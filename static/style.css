@@ -1,12 +1,10 @@
-@import url(https://fonts.googleapis.com/css?family=Oswald:300,400);
+@import url(https://fonts.googleapis.com/css?family=Kanit:100,200,400);
 body {
   background-color: #222;
-}
-#currentTime {
-  font-size: 10em;
+  font-size: 5em;
   text-align: center;
-  font-family: 'Oswald';
-  font-weight: 300;
-  color: #f05b19;
+  font-family: 'Kanit';
+  font-weight: 100;
+  color: #FFFFFF;
   margin: 100px auto;
 }
