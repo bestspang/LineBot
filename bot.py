@@ -99,8 +99,27 @@ def is_working(input_id):
     user_id = sheet.col_values(2)[1:]
     return int(sheet.col_values(4)[1:][user_id.index(input_id)])
 
+def who_work():
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    user_name = sheet.col_values(3)[1:]
+    text = ""
+    is_in = sheet.col_values(4)[1:]
+    is_in = [int(i) for i in is_in]
+    if sum(is_in) > 0:
+        text += "ที่ออฟฟิศมี : \n"
+        for i in range(len(is_in)):
+            if is_in[i] == 1:
+                text += "{}\n".format(user_name[i])
+        text += 'กำลังทำงานครับผม!'
+    else:
+        text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+    return text
+
 def checkin_out(input_id, type):
     now = datetime.datetime.now()
+    dt = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    time = datetime.timedelta(0,time_in_seconds)
+    ntime = dt + time
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]
@@ -110,7 +129,7 @@ def checkin_out(input_id, type):
     # check is_in
     sheet.update_cell(user_id.index(input_id) + 2, 4, type)
     # update log
-    row = [row_num + 1,now.strftime('%Y/%m/%d'),now.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
+    row = [row_num + 1,now.strftime('%Y/%m/%d'),ntime.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
     index = row_num + 2
     sheet2.insert_row(row, index)
     to = "C374667ff440b48857dafb57606ff4600"
@@ -594,9 +613,9 @@ def handle_message(event):
                     else:
                         response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
                 else:
-                    response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
+                    response_text = "กรุณาพิมพ์ check หรือ checkin ตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
             else:
-                response_text = "ไม่สามารถ check-in ได้เนื่องจาก\nท่านยังไม่ได้ทำการ check-out!"
+                response_text = "ไม่สามารถ check-in ได้เนื่องจากท่านยังไม่ได้ทำการ check-out!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
         line_bot_api.reply_message(
@@ -621,20 +640,7 @@ def handle_message(event):
         return 0
 
     if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
-        sheet = client.open('userCheckin').worksheet('userStatus')
-        user_name = sheet.col_values(3)[1:]
-        text = ""
-        is_in = sheet.col_values(4)[1:]
-        is_in = [int(i) for i in is_in]
-        if sum(is_in) > 0:
-            text += "ที่ออฟฟิศมี : \n"
-            for i in range(len(is_in)):
-                if is_in[i] == 1:
-                    text += "{}\n".format(user_name[i])
-            text += 'กำลังทำงานครับผม!'
-        else:
-            text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
-
+        text = who_work()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
@@ -642,36 +648,36 @@ def handle_message(event):
 
     #if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
     #if 'iswork' in text:
-    if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
-        name = ["best", "taan", "team", "snook"]
-        newdata = text.split(' ')[-1]
-        sheet = client.open('userCheckin').worksheet('userStatus')
-        user_id = sheet.col_values(2)[1:]
-        text = "กรุณาเพิ่มคำสั่ง [-a, -n] หรือ ชื่อบุคคล"
-        if newdata[0] == '-':
-            if newdata[1] == 'a':
-                user_name = sheet.col_values(3)[1:]
-                is_in = [int(i) for i in sheet.col_values(4)[1:]]
-                if sum(is_in) > 0:
-                    text += "ที่ออฟฟิศมี\n"
-                    for i in range(len(is_in)):
-                        if is_in[i] == 1:
-                            text += "{} กำลังทำงาน\n".format(user_name[i])
-                        text += 'ครับผม!'
-                else:
-                    text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
-
-                #print all people who is working
-        elif newdata in name:
-            pass
-            # find user_id from actual name
-            #get user_id
-            #int(sheet.col_values(4)[1:][user_id.index(input)])
-            #is_working(user_id)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=text))
-        return 0
+    # if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
+    #     name = ["best", "taan", "team", "snook"]
+    #     newdata = text.split(' ')[-1]
+    #     sheet = client.open('userCheckin').worksheet('userStatus')
+    #     user_id = sheet.col_values(2)[1:]
+    #     text = "กรุณาเพิ่มคำสั่ง [-a, -n] หรือ ชื่อบุคคล"
+    #     if newdata[0] == '-':
+    #         if newdata[1] == 'a':
+    #             user_name = sheet.col_values(3)[1:]
+    #             is_in = [int(i) for i in sheet.col_values(4)[1:]]
+    #             if sum(is_in) > 0:
+    #                 text += "ที่ออฟฟิศมี\n"
+    #                 for i in range(len(is_in)):
+    #                     if is_in[i] == 1:
+    #                         text += "{} กำลังทำงาน\n".format(user_name[i])
+    #                     text += 'ครับผม!'
+    #             else:
+    #                 text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+    #
+    #             #print all people who is working
+    #     elif newdata in name:
+    #         pass
+    #         # find user_id from actual name
+    #         #get user_id
+    #         #int(sheet.col_values(4)[1:][user_id.index(input)])
+    #         #is_working(user_id)
+    #     line_bot_api.reply_message(
+    #         event.reply_token,
+    #         TextSendMessage(text=text))
+    #     return 0
 
     if 'cast' in words_list or 'castto' in words_list:
         rank = member_rank(event.source.user_id)
