@@ -520,7 +520,7 @@ def handle_message(event):
 
     #if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
     #if 'iswork' in text:
-    if 'ใคร' in words_list and ('ทำงาน' in words_list or 'อยู่ที่ทำงาน' in words_list):
+    if 'ใคร' in words_list and ('ทำงานอยู่' in words_list or 'อยู่ที่ทำงาน' in words_list):
         sheet = client.open('userCheckin').worksheet('userStatus')
         user_name = sheet.col_values(3)[1:]
         text = ""
