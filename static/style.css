@@ -8,3 +8,19 @@ body {
   color: #FFFFFF;
   margin: 100px auto;
 }
+
+p {
+  font-size: 5em; /* 14px/16=0.875em */
+}
+
+p2 {
+  font-size: 2.5em; /* 14px/16=0.875em */
+}
+
+p3 {
+  font-size: 2em; /* 14px/16=0.875em */
+}
+
+h1 {
+  font-size: 8em; /* 14px/16=0.875em */
+}
