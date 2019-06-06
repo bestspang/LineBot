@@ -116,7 +116,9 @@ def who_work():
     return text
 
 def checkin_out(input_id, type):
-    now = datetime.datetime.now() #+ datetime.timedelta(seconds = time_in_seconds)
+    profile = line_bot_api.get_profile(input_id)
+    now = datetime.datetime.now()
+    ntime = now #+ datetime.timedelta(seconds = time_in_seconds)
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]
@@ -132,9 +134,9 @@ def checkin_out(input_id, type):
     to = "C374667ff440b48857dafb57606ff4600"
     if type == "1":
         text = "Check-In!"
-    else:
+    elif type == "0":
         text = "Check-out!"
-    #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' +text))
+    #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
 
 def member_rank(input):
     if is_member(input) and is_approve(input):
