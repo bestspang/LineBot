@@ -519,7 +519,29 @@ def handle_message(event):
         return 0
 
     #if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
-    if 'iswork' in text:
+    #if 'iswork' in text:
+    if 'ใคร' in words_list and ('ทำงาน' in words_list or 'อยู่ที่ทำงาน' in words_list):
+        name = ["best", "taan", "team", "snook"]
+        newdata = text.split(' ')[-1]
+        sheet = client.open('userCheckin').worksheet('userStatus')
+        user_id = sheet.col_values(2)[1:]
+        text = ""
+        user_name = sheet.col_values(3)[1:]
+        if sum(is_in) > 0:
+            is_in = sheet.col_values(4)[1:]
+            text += "ที่ออฟฟิศมี\n"
+            for i in range(len(is_in)):
+                if is_in[i] == 1:
+                    text += "{} กำลังทำงาน\n".format(user_name[i])
+                text += 'ครับผม!'
+        else:
+            text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text))
+        return 0
+
+    if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
         name = ["best", "taan", "team", "snook"]
         newdata = text.split(' ')[-1]
         sheet = client.open('userCheckin').worksheet('userStatus')
