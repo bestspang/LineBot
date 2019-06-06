@@ -518,7 +518,7 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
-    if 'is' in words_list and ('work' in words_list or 'working' in words_list):
+    if 'is' == text[:2] and ('work' == text[2:6] or 'working' == text[2:9]):
         name = ["best", "taan", "team", "snook"]
         newdata = text.split(' ')[-1]
         sheet = client.open('userCheckin').worksheet('userStatus')
