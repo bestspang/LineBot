@@ -108,7 +108,7 @@ def checkin_out(input_id, type):
     row_num = len(sheet2.col_values(1)[1:])
     #int(sheet.col_values(4)[1:][user_id.index(input_id)])
     # check is_in
-    sheet.update_cell(user_id.index(input_id) + 1, 4, type)
+    sheet.update_cell(user_id.index(input_id) + 2, 4, type)
     # update log
     row = [row_num + 1,now.strftime('%Y/%m/%d'),now.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
     index = row_num + 2
@@ -578,7 +578,7 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
-            if is_working(event.source.user_id):
+            if not is_working(event.source.user_id):
                 if 'check ' in text or 'checkin ' in text:
                     textn = text.replace('checkin ', '').replace('check ', '')
                     try:
