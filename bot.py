@@ -35,7 +35,7 @@ thread_stop_event = Event()
 
 class RandomThread(Thread):
     def __init__(self):
-        self.delay = 26
+        self.delay = 31
         self.otp = ""
         super(RandomThread, self).__init__()
 
@@ -117,9 +117,7 @@ def who_work():
 
 def checkin_out(input_id, type):
     now = datetime.datetime.now()
-    dt = now.replace(hour=0, minute=0, second=0, microsecond=0)
-    time = datetime.timedelta(0,time_in_seconds)
-    ntime = dt + time
+    ntime = now.replace(hour=0, minute=0, second=0, microsecond=0)
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]

@@ -16,9 +16,10 @@ client = gspread.authorize(creds)
 # print(user_id)
 # print(isApprove)
 
-words_list = ['ใคร','ทำงานอยู่']
+words_list = ['ใคร']
+text = "ใครทำงานอยู่"
 
-if 'ใคร' in words_list and ('ทำงานอยู่' in words_list or 'อยู่ที่ทำงาน' in words_list):
+if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_name = sheet.col_values(3)[1:]
     text = ""
@@ -32,7 +33,7 @@ if 'ใคร' in words_list and ('ทำงานอยู่' in words_list or
         text += 'กำลังทำงานครับผม!'
     else:
         text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
-        
+
 
 print(text)
 #sheet.update_cell(1, 1, newdata)
