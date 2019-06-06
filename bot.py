@@ -518,17 +518,18 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
-    if  text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
+    if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
         name = ["best", "taan", "team", "snook"]
         newdata = text.split(' ')[-1]
         sheet = client.open('userCheckin').worksheet('userStatus')
         user_id = sheet.col_values(2)[1:]
-        text = "กรุณาเพิ่มคำสั่ง [-a] หรือ ชื่อบุคคล"
+        text = "กรุณาเพิ่มคำสั่ง [-a, -n] หรือ ชื่อบุคคล"
         if newdata[0] == '-':
             if newdata[1] == 'a':
                 user_name = sheet.col_values(3)[1:]
                 if sum(is_in) > 0:
                     is_in = sheet.col_values(4)[1:]
+                    text += "ที่ออฟฟิศมี\n"
                     for i in range(len(is_in)):
                         if is_in[i] == 1:
                             text += "{} กำลังทำงาน\n".format(user_name[i])
