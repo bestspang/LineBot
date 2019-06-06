@@ -65,7 +65,7 @@ class RandomThread(Thread):
                 time = self.delay
                 self.randomNumberGenerator()
             time -= 1
-            print(time)
+            #print(time)
             socketio.emit('newtime', {'time': time}, namespace='/test')
             sleep(1)
 
