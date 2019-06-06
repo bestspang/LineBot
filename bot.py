@@ -118,7 +118,7 @@ def who_work():
 def checkin_out(input_id, type):
     profile = line_bot_api.get_profile(input_id)
     now = datetime.datetime.now()
-    ntime = now #+ datetime.timedelta(seconds = time_in_seconds)
+    ntime = now + datetime.timedelta(seconds = 25200)
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]
