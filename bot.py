@@ -100,14 +100,25 @@ def is_working(input_id):
     return int(sheet.col_values(4)[1:][user_id.index(input_id)])
 
 def checkin_out(input_id, type):
-    is_working(input_id)
-    sheet = client.open('userCheckin').worksheet('user')
-    user_id = sheet.col_values(3)[1:]
-    return sheet.col_values(6)[1:][user_id.index(input)]
-    sheet.update_cell(1, 1, newdata)
-    # row = ["I'm","inserting","a","new","row","into","a,","Spreadsheet","using","Python"]
-    # index = 3
-    # sheet.insert_row(row, index)
+    now = datetime.datetime.now()
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    user_id = sheet.col_values(2)[1:]
+    user_name = sheet.col_values(3)[1:]
+    sheet2 = client.open('userCheckin').worksheet('log')
+    row_num = len(sheet2.col_values(1)[1:])
+    #int(sheet.col_values(4)[1:][user_id.index(input_id)])
+    # check is_in
+    sheet.update_cell(user_id.index(input_id) + 1, 4, type)
+    # update log
+    row = [row_num + 1,now.strftime('%Y/%m/%d'),now.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
+    index = row_num + 2
+    sheet2.insert_row(row, index)
+    to = "C374667ff440b48857dafb57606ff4600"
+    if type == "1":
+        text = "Check-In!"
+    else:
+        text = "Check-out!"
+    #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' +text))
 
 def member_rank(input):
     if is_member(input) and is_approve(input):
@@ -567,17 +578,25 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
-            if 'check ' in text or 'checkin ' in text:
-                textn = text.replace('checkin ', '').replace('check ', '')
-                #thread = RandomTh__init__()read()
-                number = os.getenv('OTP_BACKUP')
-                if check_opt(textn, number) and textn is not None:
-                    checkin_out(event.source.user_id,"1")
-                    response_text = "Check in สำเร็จแล้วครับ!"
+            if is_working(event.source.user_id):
+                if 'check ' in text or 'checkin ' in text:
+                    textn = text.replace('checkin ', '').replace('check ', '')
+                    try:
+                        int(textn)
+                    except:
+                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"))
+                        return 0
+
+                    number = os.getenv('OTP_BACKUP')
+                    if check_opt(textn, number) and textn is not None and len(textn) == 6:
+                        checkin_out(event.source.user_id,"1")
+                        response_text = "Check in สำเร็จแล้วครับ!"
+                    else:
+                        response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
                 else:
-                    response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
+                    response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
             else:
-                response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
+                response_text = "ไม่สามารถ check-in ได้เนื่องจาก\nท่านยังไม่ได้ทำการ check-out!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
         line_bot_api.reply_message(
@@ -589,7 +608,11 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
-            response_text = "Check out สำเร็จแล้วครับ!"
+            if is_working(event.source.user_id):
+                checkin_out(event.source.user_id,"0")
+                response_text = "Check out สำเร็จแล้วครับ!"
+            else:
+                response_text = "ไม่สามารถ check-out ได้เนื่องจาก\nท่านยังไม่ได้ทำการ check-in!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
         line_bot_api.reply_message(
