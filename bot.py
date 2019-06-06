@@ -94,8 +94,20 @@ def check_opt(input, opt):
     else:
         return False
 
+def is_working(input_id):
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    user_id = sheet.col_values(2)[1:]
+    return int(sheet.col_values(4)[1:][user_id.index(input_id)])
+
 def checkin_out(input_id, type):
-    pass
+    is_working(input_id)
+    sheet = client.open('userCheckin').worksheet('user')
+    user_id = sheet.col_values(3)[1:]
+    return sheet.col_values(6)[1:][user_id.index(input)]
+    sheet.update_cell(1, 1, newdata)
+    # row = ["I'm","inserting","a","new","row","into","a,","Spreadsheet","using","Python"]
+    # index = 3
+    # sheet.insert_row(row, index)
 
 def member_rank(input):
     if is_member(input) and is_approve(input):
@@ -506,6 +518,36 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
+    if 'is' in words_list and ('work' in words_list or 'working' in words_list):
+        name = ["best", "taan", "team", "snook"]
+        newdata = text.split(' ')[-1]
+        sheet = client.open('userCheckin').worksheet('userStatus')
+        user_id = sheet.col_values(2)[1:]
+        text = "กรุณาเพิ่มคำสั่ง [-a] หรือ ชื่อบุคคล"
+        if newdata[0] == '-':
+            if newdata[1] == 'a':
+                user_name = sheet.col_values(3)[1:]
+                if sum(is_in) > 0:
+                    is_in = sheet.col_values(4)[1:]
+                    for i in range(len(is_in)):
+                        if is_in[i] == 1:
+                            text += "{} กำลังทำงาน\n".format(user_name[i])
+                        text += 'ครับผม!'
+                else:
+                    text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+
+                #print all people who is working
+        elif newdata in name:
+            pass
+            # find user_id from actual name
+            #get user_id
+            #int(sheet.col_values(4)[1:][user_id.index(input)])
+            #is_working(user_id)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text))
+        return 0
+
     if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
         line_bot_api.reply_message(event.reply_token,
             TextSendMessage(text='Most Active Value'))
@@ -559,12 +601,24 @@ def handle_message(event):
                 #thread = RandomTh__init__()read()
                 number = os.getenv('OTP_BACKUP')
                 if check_opt(textn, number) and textn is not None:
-                    checkin_out(event.source.user_id,"in")
+                    checkin_out(event.source.user_id,"1")
                     response_text = "Check in สำเร็จแล้วครับ!"
                 else:
-                    response_text = "รหัสที่คุณป้อน "+ textn +"รหัสที่ถูก "+ number
+                    response_text = "รหัสที่คุณป้อน "+ textn + "ไม่ถูกต้อง!"
             else:
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
+        else:
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
+        return 0
+
+    if 'out' in words_list or 'checkout' in words_list:
+        rank = member_rank(event.source.user_id)
+        response_text = "รหัส(code)ไม่ถูกต้องครับ!"
+        if rank in "01":
+            response_text = "Check out สำเร็จแล้วครับ!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
         line_bot_api.reply_message(
