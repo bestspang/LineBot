@@ -333,7 +333,7 @@ def extractWord(text):
     return b
 
 def getSymbol(lists):
-    for i in range(len(lsts)):
+    for i in range(len(lists)):
         if isthai(lists[i])['thai'] == 0:
             return lists[i].upper()
     return 0
@@ -574,7 +574,7 @@ def handle_message(event):
                     checkin_out(event.source.user_id,"1")
                     response_text = "Check in สำเร็จแล้วครับ!"
                 else:
-                    response_text = "รหัสที่คุณป้อน "+ textn + "ไม่ถูกต้อง!"
+                    response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
             else:
                 response_text = "กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
         else:
@@ -601,12 +601,13 @@ def handle_message(event):
         user_name = sheet.col_values(3)[1:]
         text = ""
         is_in = sheet.col_values(4)[1:]
+        is_in = [int(i) for i in is_in]
         if sum(is_in) > 0:
-            text += "ที่ออฟฟิศมี\n"
+            text += "ที่ออฟฟิศมี : \n"
             for i in range(len(is_in)):
                 if is_in[i] == 1:
-                    text += "{} กำลังทำงาน\n".format(user_name[i])
-                text += 'ครับผม!'
+                    text += "{}\n".format(user_name[i])
+            text += 'กำลังทำงานครับผม!'
         else:
             text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
         line_bot_api.reply_message(
@@ -625,8 +626,8 @@ def handle_message(event):
         if newdata[0] == '-':
             if newdata[1] == 'a':
                 user_name = sheet.col_values(3)[1:]
+                is_in = [int(i) for i in sheet.col_values(4)[1:]]
                 if sum(is_in) > 0:
-                    is_in = sheet.col_values(4)[1:]
                     text += "ที่ออฟฟิศมี\n"
                     for i in range(len(is_in)):
                         if is_in[i] == 1:
