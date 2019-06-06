@@ -1,2 +1,2 @@
-Requirement already satisfied: requests in ./linebot/lib/python3.6/site-packages (2.19.1)
+Requirement already satisfied: requests in ./linebot/lib/python3.7/site-packages (2.19.1)
 Collecting 2.0
