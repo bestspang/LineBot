@@ -608,7 +608,7 @@ def handle_message(event):
                     text += "{} กำลังทำงาน\n".format(user_name[i])
                 text += 'ครับผม!'
         else:
-            TextSendMessage = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
+            text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
@@ -631,7 +631,7 @@ def handle_message(event):
                     for i in range(len(is_in)):
                         if is_in[i] == 1:
                             text += "{} กำลังทำงาน\n".format(user_name[i])
-                        text += 'ครับผม!'
+                        text += 'คร ับผม!'
                 else:
                     text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
 
