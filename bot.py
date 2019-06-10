@@ -670,6 +670,10 @@ def handle_message(event):
             TextSendMessage(text=response_text))
         return 0
 
+    if '!test' in text:
+        is_approve_new_member()
+        return 0
+
     if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
         text = who_work()
         line_bot_api.reply_message(
