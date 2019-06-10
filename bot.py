@@ -490,9 +490,6 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('balance' in words_list or 'ยอดเงิน' in words_list):
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-        client = gspread.authorize(creds)
         sheet = client.open('AbbokIncomeAssesmentV02').sheet1
         pp = pprint.PrettyPrinter()
         balance = sheet.cell(23, 2).value
@@ -504,10 +501,6 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
-        urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-        client = gspread.authorize(creds)
         headers = requests.utils.default_headers()
         headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
         #site_request = requests.get(url, headers=headers)
@@ -541,9 +534,6 @@ def handle_message(event):
         if usern == None:
             price = "กรุณาบอกชื่อด้วยครับ"
         else:
-            scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-            creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-            client = gspread.authorize(creds)
             sheet = client.open('AbbokIncomeAssesmentV02').get_worksheet(2)
             pp = pprint.PrettyPrinter()
             num = name.index(usern)
@@ -559,9 +549,6 @@ def handle_message(event):
 
     if ('เพิิ่ม' in words_list or 'add' in words_list) and ('ข้อมูล' in words_list or 'data' in words_list):
         newdata = text.split(' ')[-1]
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-        client = gspread.authorize(creds)
         sheet = client.open('testSpreadsheet').sheet1
         pp = pprint.PrettyPrinter()
         sheet.update_cell(1, 1, newdata)
@@ -672,6 +659,9 @@ def handle_message(event):
 
     if '!test' in text:
         is_approve_new_member()
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=text))
         return 0
 
     if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
