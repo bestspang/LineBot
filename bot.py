@@ -657,7 +657,7 @@ def handle_message(event):
             TextSendMessage(text=response_text))
         return 0
 
-    if text = '!test':
+    if text == '!test':
         is_approve_new_member()
         line_bot_api.reply_message(
             event.reply_token,
