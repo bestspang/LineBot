@@ -238,7 +238,7 @@ def hello():
 
 @app.route("/notify")
 def call_func():
-    is_approve_new_member()
+    #is_approve_new_member()
     return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
