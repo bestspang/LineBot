@@ -501,6 +501,7 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
+        urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
         headers = requests.utils.default_headers()
         headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
         #site_request = requests.get(url, headers=headers)
@@ -593,8 +594,8 @@ def handle_message(event):
             TextSendMessage(text=quote))
         return 0
 #fix google dialogflow
-    if 'ทดลอง' in words_list or 'test' in words_list:
-        if 'ทดลอง ' in text or 'test ' in text:
+    if 'ทดลอง' in words_list:
+        if 'ทดลอง ' in text:
             price = 'นี้คือระบบ test : '
             textn = text.replace('ทดลอง ', '').replace('test ', '')
             project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
@@ -666,7 +667,7 @@ def handle_message(event):
 
     if text == '!help':
         is_approve_new_member()
-        line_bot_aปpi.reply_message(
+        line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="คำสั่ง"))
         return 0
