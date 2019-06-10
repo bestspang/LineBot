@@ -238,7 +238,7 @@ def hello():
 
 @app.route("/notify")
 def call_func():
-    #is_approve_new_member()
+    is_approve_new_member()
     return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
@@ -659,7 +659,7 @@ def handle_message(event):
         return 0
 
     if text == '!test':
-        is_approve_new_member()
+        #is_approve_new_member()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=text))
