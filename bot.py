@@ -666,7 +666,6 @@ def handle_message(event):
         return 0
 
     if text == '!help':
-        is_approve_new_member()
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text="คำสั่ง"))
