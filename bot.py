@@ -63,7 +63,7 @@ class RandomThread(Thread):
         while not thread_stop_event.isSet():
             if time <= 0:
                 time = self.delay
-                numbber = self.randomNumberGenerator()
+                number = self.randomNumberGenerator()
             time -= 1
             #print(time)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
