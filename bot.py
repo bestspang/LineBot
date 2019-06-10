@@ -1251,7 +1251,7 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
     elif event.postback.data == 'member_yes':
-        approve_new_member(1)
+        approve_member(1)
     elif event.postback.data == 'member_no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
