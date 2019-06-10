@@ -664,6 +664,13 @@ def handle_message(event):
             TextSendMessage(text=text))
         return 0
 
+    if '!help' in text:
+        is_approve_new_member()
+        line_bot_aปpi.reply_message(
+            event.reply_token,
+            TextSendMessage(text="คำสั่ง"))
+        return 0
+
     if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
         text = who_work()
         line_bot_api.reply_message(
