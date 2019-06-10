@@ -198,11 +198,15 @@ def is_approve_new_member():
     template_message])
 
 def approve_member(boo):
-    if boo:
+    if boo == 1:
         sheet = client.open('lineUser').worksheet('user')
         row_num = len(sheet.col_values(3)[1:])
-        sheet.update_cell(row_num+2, 4, "APPROVE")
-        sheet.update_cell(row_num+2, 4, "1")
+        sheet.update_cell(row_num+1, 4, "APPROVE")
+        sheet.update_cell(row_num+1, 6, "1")
+        sheet.upda
+        txt = 'ยืนยันสมาชิกเรียบร้อย!'
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=txt))
     else:
         pass
 
@@ -1245,11 +1249,9 @@ def handle_postback(event):
     elif event.postback.data == 'no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
+
     elif event.postback.data == 'member_yes':
         approve_new_member(1)
-        txt = 'ยืนยันสมาชิกเรียบร้อย!'
-        line_bot_api.reply_message(
-            event.reply_token, TextSendMessage(text=txt))
     elif event.postback.data == 'member_no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
