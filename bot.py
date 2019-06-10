@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify, render_template, url_for, copy_current_request_context
 from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, configparser
-import dialogflow, gspread, pprint, datetime, math #tempfile
+import dialogflow, gspread, pprint, datetime, math, functools #tempfile
 from time import sleep
 import numpy as np
 import pandas as pd
@@ -53,7 +53,7 @@ class RandomThread(Thread):
             number += digits[math.floor(random.random() * 10)]
         os.environ["OTP_BACKUP"]=number
         print(number)
-        socketio.emit('newnumber', {'number': number}, namespace='/test')
+        #socketio.emit('newnumber', {'number': number}, namespace='/test')
         #sleep(self.delay)
 
     def timeCountdown(self):
@@ -63,9 +63,10 @@ class RandomThread(Thread):
         while not thread_stop_event.isSet():
             if time <= 0:
                 time = self.delay
-                self.randomNumberGenerator()
+                numbber = self.randomNumberGenerator()
             time -= 1
             #print(time)
+            socketio.emit('newnumber', {'number': number}, namespace='/test')
             socketio.emit('newtime', {'time': time}, namespace='/test')
             sleep(1)
 
@@ -145,7 +146,6 @@ def member_rank(input):
     else:
         return False
 
-
 def is_member(input):
         sheet = client.open('lineUser').worksheet('user')
         pp = pprint.PrettyPrinter()
@@ -177,7 +177,33 @@ def add_member(input):
         index = row_num + 2
         sheet.insert_row(row, index)
         to = "C374667ff440b48857dafb57606ff4600"
-        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
+        #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
+        line_bot_api.reply_message(event.reply_token,
+        TextSendMessage(text='กรุณากรอกข้อมูลของท่านตามลิงค์ด้านล่าง\nhttps://forms.gle/gXGxjsELh9hWy9Wx9'),
+        TextSendMessage(text='ขอบคุณครับ'))
+
+def is_approve_new_member():
+    sheet = client.open('lineUser').worksheet('user')
+    name = sheet.col_values(2)[-1]
+    confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
+        PostbackAction(label='Yes',text='Yes!',data='member_yes'),
+        PostbackAction(label='No',text='No!',data='member_no'),
+    ])
+    template_message = TemplateSendMessage(
+        alt_text='Confirm alt text', template=confirm_template)
+    to = "U7612d77bbca83f04d6acf5e27333edeb"
+    line_bot_api.push_message(to, TextSendMessage(text="คุณ "+name),
+    TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
+    template_message)
+
+def approve_member(boo):
+    if boo:
+        sheet = client.open('lineUser').worksheet('user')
+        row_num = len(sheet.col_values(3)[1:])
+        sheet.update_cell(row_num+2, 4, "APPROVE")
+        sheet.update_cell(row_num+2, 4, "1")
+    else:
+        pass
 
 def make_static_tmp_dir():
     try:
@@ -207,6 +233,11 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 @app.route("/")
 def hello():
     #return "This is BP_LINEBOT2 (Mr.Doge)!"
+    return render_template('index.html')
+
+@app.route("/notify")
+def call_func():
+    is_approve_new_member()
     return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
@@ -590,7 +621,8 @@ def handle_message(event):
                 TextSendMessage(text=response_text))
         return 0
 
-#TODO : check is number
+# test decorator
+
     if 'check' in words_list or 'checkin' in words_list:
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
@@ -691,8 +723,6 @@ def handle_message(event):
 
         return 0
 
-
-
     ce = random.randint(1,10)
     if 'แบม' in words_list or 'บี้' in words_list:
         texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
@@ -753,10 +783,20 @@ def handle_message(event):
             member = "You are not a member!"
             if is_member(event.source.user_id) and is_approve(event.source.user_id):
                 member = "You are a member!"
+                carousel_template = CarouselTemplate(columns=[
+                    CarouselColumn(text='Member Setting', title='เมนูหลัก', actions=[
+                        URIAction(label='ข้อมูลสมาชิก', uri='https://www.google.com'),
+                        URIAction(label='เปลี่ยนแปลงข้อมูล', uri='https://www.google.com'),
+                        PostbackAction(label='Coming soon..', data='comingsoon')
+                    ]),
+                ])
+                template_member = TemplateSendMessage(
+                    alt_text='Carousel alt text', template=carousel_template)
                 line_bot_api.reply_message(
                     event.reply_token, [
                         TextSendMessage(text='Hello! ' + profile.display_name),
-                        TextSendMessage(text=member)
+                        TextSendMessage(text=member),
+                        template_member
                     ]
                 )
             elif is_member(event.source.user_id) and not is_approve(event.source.user_id):
@@ -940,7 +980,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, template_message)
     elif text == 'imagemap':
         pass
-    elif text == 'flex':
+    elif text == 'Abbok':
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
@@ -1198,6 +1238,15 @@ def handle_postback(event):
     elif event.postback.data == 'no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
+    elif event.postback.data == 'member_yes':
+        approve_new_member(1)
+        txt = 'ยืนยันสมาชิกเรียบร้อย!'
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=txt))
+    elif event.postback.data == 'member_no':
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
+
 
 
 @handler.add(BeaconEvent)
