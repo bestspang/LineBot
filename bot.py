@@ -53,6 +53,7 @@ class RandomThread(Thread):
             number += digits[math.floor(random.random() * 10)]
         os.environ["OTP_BACKUP"]=number
         print(number)
+        return number
         #socketio.emit('newnumber', {'number': number}, namespace='/test')
         #sleep(self.delay)
 
