@@ -178,10 +178,7 @@ def add_member(input):
         index = row_num + 2
         sheet.insert_row(row, index)
         to = "C374667ff440b48857dafb57606ff4600"
-        #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
-        line_bot_api.reply_message(event.reply_token,[
-        TextSendMessage(text='กรุณากรอกข้อมูลของท่านตามลิงค์ด้านล่าง\nhttps://forms.gle/gXGxjsELh9hWy9Wx9'),
-        TextSendMessage(text='ขอบคุณครับ')])
+        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
 def is_approve_new_member():
     sheet = client.open('lineUser').worksheet('user')
@@ -1245,6 +1242,11 @@ def handle_postback(event):
         if not is_member(event.source.user_id):
             add_member(event.source.user_id)
             txt = 'บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'
+            line_bot_api.reply_message(
+                event.reply_token, [TextSendMessage(text=txt),
+                TextSendMessage(text='รบกวนกรอกข้อมูลของท่านตามลิงค์ด้านล่าง\nhttps://forms.gle/gXGxjsELh9hWy9Wx9'),
+                TextSendMessage(text='ขอบคุณครับ')
+                ])
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
     elif event.postback.data == 'no':
