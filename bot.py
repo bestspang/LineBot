@@ -179,9 +179,9 @@ def add_member(input):
         sheet.insert_row(row, index)
         to = "C374667ff440b48857dafb57606ff4600"
         #line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
-        line_bot_api.reply_message(event.reply_token,
+        line_bot_api.reply_message(event.reply_token,[
         TextSendMessage(text='กรุณากรอกข้อมูลของท่านตามลิงค์ด้านล่าง\nhttps://forms.gle/gXGxjsELh9hWy9Wx9'),
-        TextSendMessage(text='ขอบคุณครับ'))
+        TextSendMessage(text='ขอบคุณครับ')])
 
 def is_approve_new_member():
     sheet = client.open('lineUser').worksheet('user')
