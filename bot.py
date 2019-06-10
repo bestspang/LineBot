@@ -668,7 +668,7 @@ def handle_message(event):
     if text == '!help':
         helpt = ["[จำเป็น]\n'!help'\n'check'or'checkin'-OTP\n'out'or'checkout'\n'ขอ'&ยอดเงิน'or'balance'\n'ขอ'&'เงินเดือน'or'รายได้'-\n'ขอ'&'ฟอร์ม'or'แบบฟอร์ม'\n'ขอ'&'เมนู'or'เมนูอื่นๆ'\n'ขอสรุปค่าใช้จ่าย'",
         "[ทั่วไป]\n'Abbok'\n'member'\n'ใคร'&'ทำงานอยู่'or'อยู่ที่ทำงาน'\n'trackid'or'รหัส'-รหัสไปรษณี\n'ราคา'or'หุ้น'-QUOTE\n'คำคม'or'quote'",
-        "[ทดลอง]\n'!test'\n'เพิ่มข้อมูล'or'add data'-data\n'ทดลอง'-ประโยคเพื่อคุย\n'cast'or'castto'-t\n'profile'"]
+        "[ทดลอง]\n'!test'\n'เพิ่มข้อมูล'or'add data'-data\n'ทดลอง'-ประโยคเพื่อคุย\n'cast'or'castto'-t\n'profile'\n'!vote'"]
         line_bot_api.reply_message(
             event.reply_token,[
             TextSendMessage(text=helpt[0]),
@@ -925,6 +925,11 @@ def handle_message(event):
         template_message = TemplateSendMessage(
             alt_text='Buttons alt text', template=buttons_template)
         line_bot_api.reply_message(event.reply_token, template_message)
+
+    elif text == '!vote':
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text="ระบบโหวตเร็วๆนี้"))
 
     elif 'ขอ' in words_list and ('ฟอร์ม' in words_list or 'แบบฟอร์ม' in words_list):
         buttons_template = ButtonsTemplate(

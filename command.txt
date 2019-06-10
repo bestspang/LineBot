@@ -20,3 +20,4 @@
 'ทดลอง'-ประโยคเพื่อคุย
 'cast'or'castto'-t
 'profile'
+'!vote'
