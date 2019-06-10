@@ -666,9 +666,33 @@ def handle_message(event):
         return 0
 
     if text == '!help':
+        helpt = ["[จำเป็น]\n
+        '!help'\n
+        'check'or'checkin'-OTP\n
+        'out'or'checkout'\n
+        'ขอ'&ยอดเงิน'or'balance'\n
+        'ขอ'&'เงินเดือน'or'รายได้'\n
+        'ขอ'&'ฟอร์ม'or'แบบฟอร์ม'\n
+        'ขอ'&'เมนู'or'เมนูอื่นๆ'\n
+        'ขอสรุปค่าใช้จ่าย'",
+        "[ทั่วไป]\n
+        'Abbok'\n
+        'member'\n
+        'ใคร'&'ทำงานอยู่'or'อยู่ที่ทำงาน'\n
+        'trackid'or'รหัส'-รหัสไปรษณี\n
+        'ราคา'or'หุ้น'-QUOTE\n
+        'คำคม'or'quote'",
+        "[ทดลอง]\n
+        '!test'\n
+        'เพิ่มข้อมูล'or'add data'-data\n
+        'ทดลอง'-ประโยคเพื่อคุย\n
+        'cast'or'castto'-t\n
+        'profile'"]
         line_bot_api.reply_message(
             event.reply_token,
-            TextSendMessage(text="คำสั่ง"))
+            TextSendMessage(text=helpt[0]),
+            TextSendMessage(text=helpt[1]),
+            TextSendMessage(text=helpt[2]))
         return 0
 
     if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
