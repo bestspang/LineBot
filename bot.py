@@ -4,7 +4,7 @@ from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify, render_template, url_for, copy_current_request_context
 from oauth2client.service_account import ServiceAccountCredentials
-import json, requests, random, os, errno, sys, configparser
+import json, requests, random, os, errno, sys, configparser, csv
 import dialogflow, gspread, pprint, datetime, math, functools #tempfile
 from time import sleep
 import numpy as np
@@ -95,6 +95,15 @@ def check_opt(input, opt):
         return True
     else:
         return False
+
+def gsheet_to_csv(input, opt):
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    for i, worksheet in enumerate(sheet.worksheets()):
+        filename = docid + '-worksheet' + str(i) + '.csv'
+        with open(filename, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(worksheet.get_all_values())
+
 
 def is_working(input_id):
     sheet = client.open('userCheckin').worksheet('userStatus')
