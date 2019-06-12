@@ -16,23 +16,23 @@ body {
 }
 
 p {
-  font-size: 1.2em; /* 14px/16=0.875em */
+  font-size: 1.2em;
 }
 
 p2 {
-  font-size: 0.8em; /* 14px/16=0.875em */
+  font-size: 0.8em;
 }
 
 p3 {
-  font-size: 0.5em; /* 14px/16=0.875em */
+  font-size: 0.5em;
 }
 
 p4 {
-  font-size: 1.4em; /* 14px/16=0.875em */
+  font-size: 1.4em;
 }
 
 h1 {
-  font-size: 4em; /* 14px/16=0.875em */
+  font-size: 4em;
 }
 
 .clock {
