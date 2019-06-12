@@ -35,6 +35,7 @@ h1 {
   font-size: 4em;
 }
 
+/*
 .clock {
 	position:relative;
 	font-family:monaco,consolas,"courier new",monospace;
@@ -109,7 +110,7 @@ h1 {
 	text-shadow:0 1px 0 #fff;
 	background:#eee;
 	border-radius:.125em;
-	outline:1px solid transparent; /* fix jagged edges in ff */
+	outline:1px solid transparent;
 
 	-webkit-backface-visibility:hidden;
 	-moz-backface-visibility:hidden;
@@ -169,3 +170,4 @@ h1 {
 	-ms-transform:translate3d(0,0,0) rotateX(0);
 	transform:translate3d(0,0,0) rotateX(0);
 }
+*/
