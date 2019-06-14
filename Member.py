@@ -23,7 +23,7 @@ class Member:
     def get_all_member_ids():
             sheet = client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
-            return user_id()
+            return user_id
 
     def is_member(input):
             sheet = client.open('lineUser').worksheet('user')
