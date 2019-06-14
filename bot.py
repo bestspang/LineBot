@@ -19,8 +19,8 @@ from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 from threading import Thread, Event
-from Member import Member as mem
-from Tools import Vote as vote
+from Member import Member
+from Tools import Vote
 
 __author__ = 'bestspang'
 
@@ -28,6 +28,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
+mem = Member()
+vote = Vote()
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
 
