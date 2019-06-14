@@ -151,7 +151,7 @@ def checkin_out(input_id, type):
     line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
 
 def member_rank(input):
-    if is_member(input) and is_approve(input):
+    if mem.is_member(input) and is_approve(input):
         sheet = client.open('lineUser').worksheet('user')
         user_id = sheet.col_values(3)[1:]
         return sheet.col_values(6)[1:][user_id.index(input)]
@@ -776,7 +776,7 @@ def handle_message(event):
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
             member = "You are not a member!"
-            if is_member(event.source.user_id) and is_approve(event.source.user_id):
+            if mem.is_member(event.source.user_id) and is_approve(event.source.user_id):
                 member = "You are a member!"
                 carousel_template = CarouselTemplate(columns=[
                     CarouselColumn(text='Member Setting', title='เมนูหลัก', actions=[
@@ -794,7 +794,7 @@ def handle_message(event):
                         template_member
                     ]
                 )
-            elif is_member(event.source.user_id) and not is_approve(event.source.user_id):
+            elif mem.is_member(event.source.user_id) and not is_approve(event.source.user_id):
                 member = "your application is waiting to be approve!\nplease wait!"
                 line_bot_api.reply_message(
                     event.reply_token, [
@@ -1240,7 +1240,7 @@ def handle_postback(event):
 
     elif event.postback.data == 'yes':
         txt = 'ใจเย็นๆโฮ่ง!\nส่งข้อมูลไปแล้วจ้า!'
-        if not is_member(event.source.user_id):
+        if not mem.is_member(event.source.user_id):
             add_member(event.source.user_id)
             txt = 'บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'
             line_bot_api.reply_message(
