@@ -19,6 +19,8 @@ from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 from threading import Thread, Event
+from Member import Member as mem
+from Tools import Vote as vote
 
 __author__ = 'bestspang'
 
@@ -287,26 +289,6 @@ def send_static_content(path):
 @app.route('/images/<path:path>')
 def send_images_content(path):
     return send_from_directory('images', path)
-# @app.route('/get_movie_detail', methods=['POST'])
-#     def get_movie_detail():
-#         data = request.get_json(silent=True)
-#         movie = data['queryResult']['parameters']['movie']
-#         api_key = os.getenv('OMDB_API_KEY')
-#
-#         movie_detail = requests.get('http://www.omdbapi.com/?t={0}&apikey={1}'.format(movie, api_key)).content
-#         movie_detail = json.loads(movie_detail)
-#         response =  """
-#             Title : {0}
-#             Released: {1}
-#             Actors: {2}
-#             Plot: {3}
-#         """.format(movie_detail['Title'], movie_detail['Released'], movie_detail['Actors'], movie_detail['Plot'])
-#
-#         reply = {
-#             "fulfillmentText": response,
-#         }
-#
-#         return jsonify(reply)
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
@@ -859,6 +841,16 @@ def handle_message(event):
         line_bot_api.reply_message(
             event.reply_token, [
                 TextSendMessage(text='total usage: ' + str(quota_consumption.total_usage)),
+            ]
+        )
+    elif text == 'ขอidmember':
+        textn = mem.get_all_member_ids()
+        text = ""
+        for i in textn:
+            text += i + "\n"
+        line_bot_api.reply_message(
+            event.reply_token, [
+                TextSendMessage(text=text)),
             ]
         )
     elif text == 'push':
