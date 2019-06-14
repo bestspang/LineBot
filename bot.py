@@ -29,7 +29,7 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
 mem = Member()
-vote = Vote()
+#vote = Vote()
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
 
