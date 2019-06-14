@@ -850,7 +850,7 @@ def handle_message(event):
             text += i + "\n"
         line_bot_api.reply_message(
             event.reply_token, [
-                TextSendMessage(text=text)),
+                TextSendMessage(text=text),
             ]
         )
     elif text == 'push':
