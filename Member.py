@@ -28,9 +28,14 @@ class Member:
             sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             if input in user_id:
+                #sheet.col_values(4)[1:][user_id.index(input)]
                 return True
             else:
                 return False
+            #pp.pprint(balance)
+            #sheet = client.open('testSpreadsheet').sheet1
+            #pp = pprint.PrettyPrinter()
+            #sheet.update_cell(1, 1, newdata)
 
     def is_approve(self,input):
             sheet = self.client.open('lineUser').worksheet('user')
