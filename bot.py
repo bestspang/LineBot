@@ -2,7 +2,7 @@ import gevent.monkey
 gevent.monkey.patch_all()
 from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
-from flask import Flask, request, abort, send_from_directory, jsonify, render_template, url_for, copy_current_request_context
+from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
 import json, requests, random, os, errno, sys, configparser, csv
 import dialogflow, gspread, pprint, datetime, math, functools #tempfile
@@ -236,6 +236,15 @@ def hello():
 def call_func():
     is_approve_new_member()
     return render_template('index.html')
+
+# @app.route('/time_feed')
+# def time_feed():
+#     def generate():
+#         datetime = datetime.datetime.now().strftime("%Y.%m.%d|%H:%M:%S")
+#         print(datetime)
+#         return datetime  # return also will work
+#     return render_template('date_time.html')
+#     #return Response(generate(), mimetype='text')
 
 @socketio.on('connect', namespace='/test')
 def test_connect():

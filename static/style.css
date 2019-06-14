@@ -16,7 +16,7 @@ body {
 }
 
 p {
-  font-size: 1.2em;
+  font-size: 1em;
 }
 
 p2 {
@@ -35,7 +35,7 @@ h1 {
   font-size: 4em;
 }
 
-/*
+
 .clock {
 	position:relative;
 	font-family:monaco,consolas,"courier new",monospace;
@@ -170,4 +170,3 @@ h1 {
 	-ms-transform:translate3d(0,0,0) rotateX(0);
 	transform:translate3d(0,0,0) rotateX(0);
 }
-*/
