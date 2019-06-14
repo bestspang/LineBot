@@ -7,8 +7,8 @@ class Member:
         #self.id = id
         #self.line_id = line_id
         #self.marks = []
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        self.scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        self.creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
         self.client = gspread.authorize(creds)
 
     def member_rank(self,input):
