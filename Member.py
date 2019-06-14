@@ -7,11 +7,11 @@ class Member:
         #self.id = id
         #self.line_id = line_id
         #self.marks = []
-        self.scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        self.creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
         self.client = gspread.authorize(creds)
 
-    def member_rank(input):
+    def member_rank(self,input):
         if is_member(input) and is_approve(input):
             sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
@@ -19,12 +19,12 @@ class Member:
         else:
             return False
 
-    def get_all_member_ids():
+    def get_all_member_ids(self):
             sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             return user_id
 
-    def is_member(input):
+    def is_member(self,input):
             sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             if input in user_id:
@@ -32,7 +32,7 @@ class Member:
             else:
                 return False
 
-    def is_approve(input):
+    def is_approve(self,input):
             sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
@@ -40,7 +40,7 @@ class Member:
             else:
                 return False
 
-    def add_member(input):
+    def add_member(self,input):
             sheet = self.client.open('lineUser').worksheet('user')
             profile = line_bot_api.get_profile(input)
             now = datetime.datetime.now()
@@ -51,7 +51,7 @@ class Member:
             to = "C374667ff440b48857dafb57606ff4600"
             line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
-    def is_approve_new_member():
+    def is_approve_new_member(self):
         sheet = self.client.open('lineUser').worksheet('user')
         name = sheet.col_values(2)[-1]
         confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
@@ -65,7 +65,7 @@ class Member:
         TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
         template_message])
 
-    def approve_member(boo):
+    def approve_member(self,boo):
         if boo == 1:
             sheet = self.client.open('lineUser').worksheet('user')
             row_num = len(sheet.col_values(3)[1:])
