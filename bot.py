@@ -160,20 +160,6 @@ def member_rank(input):
     else:
         return False
 
-def is_member(input):
-        sheet = client.open('lineUser').worksheet('user')
-        pp = pprint.PrettyPrinter()
-        user_id = sheet.col_values(3)[1:]
-        if input in user_id:
-            #sheet.col_values(4)[1:][user_id.index(input)]
-            return True
-        else:
-            return False
-        #pp.pprint(balance)
-        #sheet = client.open('testSpreadsheet').sheet1
-        #pp = pprint.PrettyPrinter()
-        #sheet.update_cell(1, 1, newdata)
-
 def is_approve(input):
         sheet = client.open('lineUser').worksheet('user')
         user_id = sheet.col_values(3)[1:]
@@ -845,8 +831,8 @@ def handle_message(event):
                 TextSendMessage(text='total usage: ' + str(quota_consumption.total_usage)),
             ]
         )
-    elif text == 'ขอidmember':
-        textn = mem.get_all_member_ids()
+    elif text == 'ขอชื่อพนักงาน' or text == 'ขอชื่อสมาชิิก':
+        textn = mem.get_all_member_names()
         text = ""
         for i in textn:
             text += i + "\n"

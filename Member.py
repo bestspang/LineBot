@@ -20,9 +20,23 @@ class Member:
             return False
 
     def get_all_member_ids(self):
-            sheet = self.client.open('lineUser').worksheet('user')
+            sheet = self.client.open('userCheckin').worksheet('userStatus')
+            user_id = sheet.col_values(2)[1:]
+            return user_id
+
+    def get_all_member_names(self):
+            sheet = self.client.open('userCheckin').worksheet('userStatus')
             user_id = sheet.col_values(3)[1:]
             return user_id
+
+    def get_key_by_name(self, input):
+            key = get_all_member_ids()
+            name = get_all_member_names()
+            try:
+                line_key = key[name.index(input)]
+            except:
+                return False
+            return line_key
 
     def is_member(self,input):
             sheet = self.client.open('lineUser').worksheet('user')
