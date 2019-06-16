@@ -221,6 +221,7 @@ def print_date_time():
 @app.before_first_request
 def init_scheduler():
     check_time()
+    print("lunch scheduler!")
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
@@ -1235,5 +1236,5 @@ def handle_beacon(event):
 if __name__ == "__main__":
     init_scheduler()
     make_static_tmp_dir()
-    socketio.run(app)
+    socketio.run(app) # , log_output=False
     #app.run()
