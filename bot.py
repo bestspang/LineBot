@@ -251,8 +251,8 @@ def getQuote():
     return quote
 
 # TODO : fix to make it start from today()
-waking_time = "2019-6-16T16:30:00"
-date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
+waking_time = "2019-6-16T16:30:00:00"
+date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S:%f')
 def print_date_time():
     global date_time
     to = "C374667ff440b48857dafb57606ff4600"
