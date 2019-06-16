@@ -230,8 +230,6 @@ def init_scheduler():
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
-init_scheduler()
-
 @app.route("/")
 def hello():
     #return "This is BP_LINEBOT2 (Mr.Doge)!"
@@ -1237,5 +1235,6 @@ def handle_beacon(event):
 
 if __name__ == "__main__":
     make_static_tmp_dir()
+    init_scheduler()
     socketio.run(app) # , log_output=False
     #app.run()
