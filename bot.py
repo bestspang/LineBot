@@ -1,5 +1,5 @@
 import gevent.monkey
-gevent.monkey.patch_all()
+gevent.monkey.patch_all(thread=False)
 from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
