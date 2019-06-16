@@ -1,5 +1,6 @@
-import csv, json, requests
 from Member import Member
+from threading import Thread
+import csv, json, requests, math, os, time, random
 
 class Tools:
     def __init__(self):
@@ -20,6 +21,13 @@ class Tools:
         quote = "{} - {}".format(quote[0], quote[1])
         print(quote)
         return quote
+
+    def is_number(self, s):
+        try:
+            float(s)
+            return True
+        except ValueError:
+            return False
 
 
 class Vote:
@@ -58,3 +66,48 @@ class Vote:
                         self.total_vote -= 1
         reader.close()
         return self.total_vote
+
+class RandomThread(Thread):
+    def __init__(self, socketio, thread_stop_event):
+        self.delay = 31
+        self.otp = ""
+        self.socketio = socketio
+        self.thread_stop_event = thread_stop_event
+        #self.Thread = Thread
+        super(RandomThread, self).__init__()
+
+    def randomNumberGenerator(self):
+        """
+        Generate a random number every 1 second and emit to a socketio instance (broadcast)
+        Ideally to be run in a separate thread?
+        """
+        #infinite loop of magical random numbers
+        print("Making random numbers")
+        #while not thread_stop_event.isSet():
+        digits = "0123456789"
+        number = ""
+        for i in range(6):
+            number += digits[math.floor(random.random() * 10)]
+        os.environ["OTP_BACKUP"]=number
+        print(number)
+        return number
+        #socketio.emit('newnumber', {'number': number}, namespace='/test')
+        #sleep(self.delay)
+
+    def timeCountdown(self):
+        #infinite loop of magical random numbers
+        print("Counting down")
+        t = 0
+        while not self.thread_stop_event.isSet():
+            if t <= 0:
+                t = self.delay
+                number = self.randomNumberGenerator()
+            t -= 1
+            #print(time)
+            self.socketio.emit('newnumber', {'number': number}, namespace='/test')
+            self.socketio.emit('newtime', {'time': t}, namespace='/test')
+            time.sleep(1)
+
+    def run(self):
+        #self.randomNumberGenerator()
+        self.timeCountdown()

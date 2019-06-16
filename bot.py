@@ -4,8 +4,8 @@ from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
-import json, requests, random, os, errno, sys, configparser, csv, atexit
-import dialogflow, gspread, pprint, datetime, math, functools, time #tempfile
+import requests, random, os, errno, sys, configparser, csv, atexit
+import dialogflow, gspread, pprint, datetime, functools, time #tempfile
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize
@@ -20,7 +20,7 @@ from linebot.models import *
 from threading import Thread, Event
 from apscheduler.schedulers.background import BackgroundScheduler
 from Member import Member
-from Tools import Vote, Tools
+from Tools import Vote, Tools, RandomThread
 
 __author__ = 'bestspang'
 
@@ -33,7 +33,6 @@ tools = Tools()
 #vote = Vote()
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
-
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
@@ -41,50 +40,6 @@ thread_stop_event = Event()
 # initialize scheduler with your preferred timezone
 scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
 scheduler.start()
-# Shut down the scheduler when exiting the app
-# atexit.register(lambda: scheduler.shutdown())
-
-class RandomThread(Thread):
-    def __init__(self):
-        self.delay = 31
-        self.otp = ""
-        super(RandomThread, self).__init__()
-
-    def randomNumberGenerator(self):
-        """
-        Generate a random number every 1 second and emit to a socketio instance (broadcast)
-        Ideally to be run in a separate thread?
-        """
-        #infinite loop of magical random numbers
-        print("Making random numbers")
-        #while not thread_stop_event.isSet():
-        digits = "0123456789"
-        number = ""
-        for i in range(6):
-            number += digits[math.floor(random.random() * 10)]
-        os.environ["OTP_BACKUP"]=number
-        print(number)
-        return number
-        #socketio.emit('newnumber', {'number': number}, namespace='/test')
-        #sleep(self.delay)
-
-    def timeCountdown(self):
-        #infinite loop of magical random numbers
-        print("Counting down")
-        t = 0
-        while not thread_stop_event.isSet():
-            if t <= 0:
-                t = self.delay
-                number = self.randomNumberGenerator()
-            t -= 1
-            #print(time)
-            socketio.emit('newnumber', {'number': number}, namespace='/test')
-            socketio.emit('newtime', {'time': t}, namespace='/test')
-            time.sleep(1)
-
-    def run(self):
-        #self.randomNumberGenerator()
-        self.timeCountdown()
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -234,29 +189,13 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
         return response.query_result.fulfillment_text
 
-def getQuote():
-    print("\n")
-    url = 'http://quotes.rest/qod.json'
-    print("connecting.. : " + url + "\n")
-
-    headers = requests.utils.default_headers()
-    headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
-    site_request = requests.get(url, headers=headers)
-    data = json.loads(site_request.text)
-
-    quote = data['contents']['quotes']
-    quote = [quote[0]['quote'], quote[0]['author']]
-    quote = "{} - {}".format(quote[0], quote[1])
-    print(quote)
-    return quote
-
 # TODO : fix to make it start from today()
-waking_time = "2019-6-16T16:30:00:00"
-date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S:%f')
+waking_time = "2019-6-16T16:30:00"
+date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
 def print_date_time():
     global date_time
     to = "C374667ff440b48857dafb57606ff4600"
-    line_bot_api.push_message(to, TextSendMessage(text=getQuote()))
+    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     date_time += timedelta(days=1)
 #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
 job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
@@ -271,25 +210,17 @@ def call_func():
     is_approve_new_member()
     return render_template('index.html')
 
-# @app.route('/time_feed')
-# def time_feed():
-#     def generate():
-#         datetime = datetime.datetime.now().strftime("%Y.%m.%d|%H:%M:%S")
-#         print(datetime)
-#         return datetime  # return also will work
-#     return render_template('date_time.html')
-#     #return Response(generate(), mimetype='text')
-
 @socketio.on('connect', namespace='/test')
 def test_connect():
     # need visibility of the global thread object
     global thread
+    global socketio
     print('Client connected')
 
     #Start the random number generator thread only if the thread has not been started before.
     if not thread.isAlive():
         print("Starting Thread")
-        thread = RandomThread()
+        thread = RandomThread(socketio=socketio,thread_stop_event=thread_stop_event)
         thread.start()
 
 @socketio.on('disconnect', namespace='/test')
@@ -442,13 +373,6 @@ def makeDF(soupdata, ind=0):
     row_list = np.reshape(row_list, (total_col, num_col) )
     return pd.DataFrame(columns = head_list, data = row_list)
 
-def is_number(s):
-    try:
-        float(s)
-        return True
-    except ValueError:
-        return False
-
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     global number
@@ -462,7 +386,7 @@ def handle_message(event):
         elif price == 0:
             return 0
         else:
-            if not is_number(money):
+            if not tools.is_number(money):
                 price = 'ราคายังไม่มีการอัพเดทครัช'
         line_bot_api.reply_message(
             event.reply_token,
