@@ -198,7 +198,6 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 waking_time = datetime.date.today().strftime("%Y-%m-%d")+"T9:30:00"
 date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
 
-@app.before_first_request
 def check_time():
     global date_time
     check_time = date_time - datetime.datetime.now()
@@ -207,8 +206,6 @@ def check_time():
         line_bot_api.push_message("U7612d77bbca83f04d6acf5e27333edeb", TextSendMessage(text="ปรับเวลาเป็นวันพรุ่งนี้!"))
         date_time += datetime.timedelta(days=1)
         print(date_time)
-
-check_time()
 
 def print_date_time():
     global date_time
@@ -223,6 +220,7 @@ def print_date_time():
 
 @app.before_first_request
 def init_scheduler():
+    check_time()
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
