@@ -70,15 +70,15 @@ class RandomThread(Thread):
     def timeCountdown(self):
         #infinite loop of magical random numbers
         print("Counting down")
-        time = 0
+        t = 0
         while not thread_stop_event.isSet():
-            if time <= 0:
-                time = self.delay
+            if t <= 0:
+                t = self.delay
                 number = self.randomNumberGenerator()
-            time -= 1
+            t -= 1
             #print(time)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
-            socketio.emit('newtime', {'time': time}, namespace='/test')
+            socketio.emit('newtime', {'time': t}, namespace='/test')
             time.sleep(1)
 
     def run(self):
