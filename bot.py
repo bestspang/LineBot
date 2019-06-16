@@ -249,6 +249,7 @@ def getQuote():
     print(quote)
     return quote
 
+# TODO : fix to make it start from today()
 time = "2019-6-16T16:00:00"
 date_time = datetime.datetime.strptime(str(time), '%Y-%m-%dT%H:%M:%S')
 def print_date_time():
