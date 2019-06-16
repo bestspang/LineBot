@@ -70,7 +70,6 @@ def gsheet_to_csv(input, opt):
             writer = csv.writer(f)
             writer.writerows(worksheet.get_all_values())
 
-
 def is_working(input_id):
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
@@ -108,11 +107,19 @@ def checkin_out(input_id, type):
     index = row_num + 2
     sheet2.insert_row(row, index)
     to = "C374667ff440b48857dafb57606ff4600"
+    to_user = input_id
     if type == "1":
         text = "Check-In!"
+        sheet.update_cell(user_id.index(input_id) + 2, 5, now.strftime("%I:%M %p"))
     elif type == "0":
         text = "Check-out!"
+        total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
+        total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วิินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
+        sheet.update_cell(user_id.index(input_id) + 2, 5, '')
+        line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
+
     line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
+
 
 def member_rank(input):
     if mem.is_member(input) and is_approve(input):
@@ -609,39 +616,6 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=text))
         return 0
-
-    #if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
-    #if 'iswork' in text:
-    # if text[:2] == 'is' and (text[2:6] == 'work' or text[2:9] == 'working'):
-    #     name = ["best", "taan", "team", "snook"]
-    #     newdata = text.split(' ')[-1]
-    #     sheet = client.open('userCheckin').worksheet('userStatus')
-    #     user_id = sheet.col_values(2)[1:]
-    #     text = "กรุณาเพิ่มคำสั่ง [-a, -n] หรือ ชื่อบุคคล"
-    #     if newdata[0] == '-':
-    #         if newdata[1] == 'a':
-    #             user_name = sheet.col_values(3)[1:]
-    #             is_in = [int(i) for i in sheet.col_values(4)[1:]]
-    #             if sum(is_in) > 0:
-    #                 text += "ที่ออฟฟิศมี\n"
-    #                 for i in range(len(is_in)):
-    #                     if is_in[i] == 1:
-    #                         text += "{} กำลังทำงาน\n".format(user_name[i])
-    #                     text += 'ครับผม!'
-    #             else:
-    #                 text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
-    #
-    #             #print all people who is working
-    #     elif newdata in name:
-    #         pass
-    #         # find user_id from actual name
-    #         #get user_id
-    #         #int(sheet.col_values(4)[1:][user_id.index(input)])
-    #         #is_working(user_id)
-    #     line_bot_api.reply_message(
-    #         event.reply_token,
-    #         TextSendMessage(text=text))
-    #     return 0
 
     if 'cast' in words_list or 'castto' in words_list:
         rank = member_rank(event.source.user_id)
