@@ -37,10 +37,6 @@ socketio = SocketIO(app)
 thread = Thread()
 thread_stop_event = Event()
 
-# initialize scheduler with your preferred timezone
-scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
-scheduler.start()
-
 config = configparser.ConfigParser()
 config.read("config.ini")
 #info = [NICKNAME,FIRST_NAME,FN_TH,LAST_NAME,LN_TH,E_MAIL,PERSONAL_ID,DOB,ADDR,MOBILE_NO,BANK_S,BANK_NO,BRANCHES]
@@ -197,15 +193,40 @@ def detect_intent_texts(project_id, session_id, text, language_code):
         return response.query_result.fulfillment_text
 
 # TODO : fix to make it start from today()
-waking_time = "2019-6-16T16:30:00"
+# initialize scheduler with your preferred timezone
+
+waking_time = datetime.date.today().strftime("%Y-%m-%d")+"T9:30:00"
 date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
+check_time = date_time - datetime.datetime.now()
+if check_time.days == -1:
+    print("time change!")
+    line_bot_api.push_message("U7612d77bbca83f04d6acf5e27333edeb", TextSendMessage(text="ปรับเวลาเป็นวันพรุ่งนี้!"))
+    date_time += datetime.timedelta(days=1)
+    print(date_time)
+elif check_time.days == 0:
+    pass
+
+
 def print_date_time():
     global date_time
+    date_time += datetime.timedelta(days=1)
     to = "C374667ff440b48857dafb57606ff4600"
+    to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a",
+            "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09",
+            "Uc1f00d375dd0d706511f4957e4ccc491"]
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
-    date_time += timedelta(days=1)
-#scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
-job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
+    for i in to_mem:
+        line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
+
+@app.before_first_request
+def init_scheduler():
+    scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
+    #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+    job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
+    scheduler.start()
+    # Shut down the scheduler when exiting the app
+    atexit.register(lambda: scheduler.shutdown())
+
 
 @app.route("/")
 def hello():
@@ -1211,6 +1232,7 @@ def handle_beacon(event):
             TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
+    init_scheduler()
     make_static_tmp_dir()
     socketio.run(app)
     #app.run()
