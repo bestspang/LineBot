@@ -29,6 +29,7 @@ app.config['SECRET_KEY'] = 'secret!'
 app.config['DEBUG'] = True
 
 mem = Member()
+tools = Tools()
 #vote = Vote()
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
@@ -587,7 +588,7 @@ def handle_message(event):
 
     if 'คำคม' in words_list or 'quote' in words_list:
         price = 'นี้คือระบบ test ครับ'
-        quote = Tools.getQuote()
+        quote = tools.getQuote()
         # line_bot_api.reply_message(
         #     event.reply_token,
         #     TextSendMessage(text=price))
