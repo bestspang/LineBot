@@ -220,6 +220,7 @@ def print_date_time():
 
 @app.before_first_request
 def init_scheduler():
+    global date_time
     check_time()
     print("lunch scheduler!")
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
@@ -229,6 +230,7 @@ def init_scheduler():
     # Shut down the scheduler when exiting the app
     atexit.register(lambda: scheduler.shutdown())
 
+init_scheduler()
 
 @app.route("/")
 def hello():
@@ -1234,7 +1236,6 @@ def handle_beacon(event):
             TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
-    init_scheduler()
     make_static_tmp_dir()
     socketio.run(app) # , log_output=False
     #app.run()
