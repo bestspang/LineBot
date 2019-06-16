@@ -1,5 +1,5 @@
 import gevent.monkey
-gevent.monkey.patch_all(thread=False)
+gevent.monkey.patch_all()
 from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
@@ -197,15 +197,18 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
 waking_time = datetime.date.today().strftime("%Y-%m-%d")+"T9:30:00"
 date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
-check_time = date_time - datetime.datetime.now()
-if check_time.days == -1:
-    print("time change!")
-    line_bot_api.push_message("U7612d77bbca83f04d6acf5e27333edeb", TextSendMessage(text="ปรับเวลาเป็นวันพรุ่งนี้!"))
-    date_time += datetime.timedelta(days=1)
-    print(date_time)
-elif check_time.days == 0:
-    pass
 
+@app.before_first_request
+def check_time():
+    global date_time
+    check_time = date_time - datetime.datetime.now()
+    if check_time.days == -1:
+        print("time change!")
+        line_bot_api.push_message("U7612d77bbca83f04d6acf5e27333edeb", TextSendMessage(text="ปรับเวลาเป็นวันพรุ่งนี้!"))
+        date_time += datetime.timedelta(days=1)
+        print(date_time)
+
+check_time()
 
 def print_date_time():
     global date_time
