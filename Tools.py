@@ -1,19 +1,26 @@
-import csv
+import csv, json, requests
 from Member import Member
 
 class Tools:
-    def __init__(self, name, id, line_id):
-        self.name = name
-        self.id = id
-        self.line_id = line_id
-        self.marks = []
+    def __init__(self):
+        self.result = None
 
-    def average(self):
-        return sum(self.marks) / len(self.marks)
+    def getQuote(self):
+        print("\n")
+        url = 'http://quotes.rest/qod.json'
+        print("connecting.. : " + url + "\n")
 
-    @classmethod
-    def friend(cls, origin, friend_name, *args, **kwargs):
-        return cls(friend_name, origin.salary, *args, **kwargs)
+        headers = requests.utils.default_headers()
+        headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
+        site_request = requests.get(url, headers=headers)
+        data = json.loads(site_request.text)
+
+        quote = data['contents']['quotes']
+        quote = [quote[0]['quote'], quote[0]['author']]
+        quote = "{} - {}".format(quote[0], quote[1])
+        print(quote)
+        return quote
+
 
 class Vote:
     def __init__(self):

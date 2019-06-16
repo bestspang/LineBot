@@ -1,5 +1,6 @@
 from oauth2client.service_account import ServiceAccountCredentials
 import gspread, pprint
+from user import User
 
 class Member:
     def __init__(self):

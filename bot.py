@@ -4,9 +4,8 @@ from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
-import json, requests, random, os, errno, sys, configparser, csv
-import dialogflow, gspread, pprint, datetime, math, functools #tempfile
-from time import sleep
+import json, requests, random, os, errno, sys, configparser, csv, atexit
+import dialogflow, gspread, pprint, datetime, math, functools, time #tempfile
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize
@@ -19,8 +18,9 @@ from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 from threading import Thread, Event
+from apscheduler.schedulers.background import BackgroundScheduler
 from Member import Member
-from Tools import Vote
+from Tools import Vote, Tools
 
 __author__ = 'bestspang'
 
@@ -36,6 +36,12 @@ socketio = SocketIO(app)
 #random number Generator Thread
 thread = Thread()
 thread_stop_event = Event()
+
+# initialize scheduler with your preferred timezone
+scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
+scheduler.start()
+# Shut down the scheduler when exiting the app
+# atexit.register(lambda: scheduler.shutdown())
 
 class RandomThread(Thread):
     def __init__(self):
@@ -73,7 +79,7 @@ class RandomThread(Thread):
             #print(time)
             socketio.emit('newnumber', {'number': number}, namespace='/test')
             socketio.emit('newtime', {'time': time}, namespace='/test')
-            sleep(1)
+            time.sleep(1)
 
     def run(self):
         #self.randomNumberGenerator()
@@ -227,6 +233,32 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
         return response.query_result.fulfillment_text
 
+def getQuote():
+    print("\n")
+    url = 'http://quotes.rest/qod.json'
+    print("connecting.. : " + url + "\n")
+
+    headers = requests.utils.default_headers()
+    headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
+    site_request = requests.get(url, headers=headers)
+    data = json.loads(site_request.text)
+
+    quote = data['contents']['quotes']
+    quote = [quote[0]['quote'], quote[0]['author']]
+    quote = "{} - {}".format(quote[0], quote[1])
+    print(quote)
+    return quote
+
+time = "2019-6-16T16:00:00"
+date_time = datetime.datetime.strptime(str(time), '%Y-%m-%dT%H:%M:%S')
+def print_date_time():
+    global date_time
+    to = "C374667ff440b48857dafb57606ff4600"
+    line_bot_api.push_message(to, TextSendMessage(text=getQuote()))
+    date_time += timedelta(days=1)
+#scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
+job = scheduler.add_job(func=print_date_time, trigger='date', next_run_time=str(date_time))# args=[text]
+
 @app.route("/")
 def hello():
     #return "This is BP_LINEBOT2 (Mr.Doge)!"
@@ -308,22 +340,6 @@ def getData(track_id):
     site_content = soup(site_request.content, "html.parser")
     site_data = site_content.findAll("div", {"class":"col colStatus"})
     return site_data
-
-def getQuote():
-    print("\n")
-    url = 'http://quotes.rest/qod.json'
-    print("connecting.. : " + url + "\n")
-
-    headers = requests.utils.default_headers()
-    headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
-    site_request = requests.get(url, headers=headers)
-    data = json.loads(site_request.text)
-
-    quote = data['contents']['quotes']
-    quote = [quote[0]['quote'], quote[0]['author']]
-    quote = "{} - {}".format(quote[0], quote[1])
-    print(quote)
-    return quote
 
 def cleanData(site_data, ind=0):
     list = []
@@ -570,7 +586,7 @@ def handle_message(event):
 
     if 'คำคม' in words_list or 'quote' in words_list:
         price = 'นี้คือระบบ test ครับ'
-        quote = getQuote()
+        quote = Tools.getQuote()
         # line_bot_api.reply_message(
         #     event.reply_token,
         #     TextSendMessage(text=price))
