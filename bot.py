@@ -110,7 +110,7 @@ def checkin_out(input_id, type):
     elif type == "0":
         text = "Check-out!"
         total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
-        total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วิินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
+        total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
         sheet.update_cell(user_id.index(input_id) + 2, 5, '')
         line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
 
@@ -200,13 +200,14 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 def print_date_time():
     # global date_time
     # date_time += datetime.timedelta(days=1)
-    to = "C374667ff440b48857dafb57606ff4600"
+    to = "U7612d77bbca83f04d6acf5e27333edeb" #best
+    #to = "C374667ff440b48857dafb57606ff4600" #group
     to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a",
             "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09",
             "Uc1f00d375dd0d706511f4957e4ccc491"]
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
-    for i in to_mem:
-        line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
+    # for i in to_mem:
+    #     line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
 @app.before_first_request
 def init_scheduler():
@@ -214,13 +215,16 @@ def init_scheduler():
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
-                hour=9, minute=30)# args=[text]
+                hour=20, minute=50)# args=[text]
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
 
 if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    print("scheduler True!")
     init_scheduler()
+else:
+    print("scheduler False!")
 
 @app.route("/")
 def hello():
