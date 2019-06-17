@@ -215,15 +215,17 @@ def init_scheduler():
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
-                hour=0, minute=36)# args=[text]
+                hour=0, minute=46)# args=[text]
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
-mem1 = 1
-if (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true') and mem1 == 1:
+
+#if (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true') and mem1 == 1:
+if os.environ["WORKER01"] == "1":
     print("scheduler True!")
     init_scheduler()
     mem1 = 0
+    os.environ["WORKER01"] = "0"
 else:
     print("scheduler False!")
 
