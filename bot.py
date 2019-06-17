@@ -209,20 +209,39 @@ def print_date_time():
     # for i in to_mem:
     #     line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
-@app.before_first_request
+#@app.before_first_request
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
-                hour=1, minute=2)# args=[text]
+                hour=1, minute=35)# args=[text]
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
 
-if (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'):
+def csv_read():
+    with open('isrun.csv', 'r') as f:
+            reader = csv.reader(f)
+            # read file row by row
+            a = []
+            for row in reader:
+                a.append(row)
+    return a[1][0]
+
+def csv_write():
+    with open('isrun.csv', 'w') as f:
+            reader = csv.writer(f)
+            # read file row by row
+            reader.writerow(['is_run'])
+            reader.writerow(['0'])
+
+#if (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'):
+if str(csv_read()) == "1":
     print("scheduler True!")
     init_scheduler()
+    csv_write()
+
 else:
     print("scheduler False!")
 
