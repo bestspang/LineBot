@@ -226,6 +226,16 @@ if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
 else:
     print("scheduler False!")
 
+if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
+    print("WERK t")
+else:
+    print("WERK f")
+
+if app.debug:
+    print("debuk t")
+else:
+    print("debuk f")
+
 @app.route("/")
 def hello():
     #return "This is BP_LINEBOT2 (Mr.Doge)!"
