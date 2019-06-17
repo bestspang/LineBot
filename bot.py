@@ -25,8 +25,8 @@ from Tools import Vote, Tools, RandomThread
 __author__ = 'bestspang'
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'secret!'
-app.config['DEBUG'] = True
+app.config['SECRET_KEY'] = 'secret!!!'
+app.config['DEBUG'] = False
 
 mem = Member()
 tools = Tools()
@@ -215,7 +215,7 @@ def init_scheduler():
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
-                hour=23, minute=25)# args=[text]
+                hour=24, minute=25)# args=[text]
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
@@ -226,15 +226,6 @@ if not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
 else:
     print("scheduler False!")
 
-if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-    print("WERK t")
-else:
-    print("WERK f")
-
-if app.debug:
-    print("debuk t")
-else:
-    print("debuk f")
 
 @app.route("/")
 def hello():
