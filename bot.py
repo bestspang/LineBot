@@ -215,7 +215,7 @@ def init_scheduler():
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
-                hour=21, minute=50)# args=[text]
+                hour=22, minute=18)# args=[text]
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
