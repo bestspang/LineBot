@@ -28,9 +28,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!!!'
 app.config['DEBUG'] = False
 
-mem = Member()
-tools = Tools()
-#vote = Vote()
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
 #random number Generator Thread
@@ -51,6 +48,10 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
 client = gspread.authorize(creds)
+
+mem = Member(client)
+tools = Tools()
+#vote = Vote()
 
 def check_opt(input, opt):
     if input == opt:
