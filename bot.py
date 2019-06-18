@@ -49,7 +49,7 @@ scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/aut
 creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
 client = gspread.authorize(creds)
 
-mem = Member(client)
+mem = Member()
 tools = Tools()
 #vote = Vote()
 
