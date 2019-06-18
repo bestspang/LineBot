@@ -9,14 +9,15 @@ name_mapping = {u.name: u for u in users}
 lineid_mapping = {u.line_id: u for u in users}
 
 class Member:
-    def __init__(self):
+    def __init__(self, spread):
         #self.name = name
         #self.id = id
         #self.line_id = line_id
         #self.marks = []
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-        self.client = gspread.authorize(creds)
+        #scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        #creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        #self.client = gspread.authorize(creds)
+        self.client = spread
 
     # def authenticate(self, username, password):
     #     user = username_mapping.get(username, None)

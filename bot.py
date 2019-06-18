@@ -49,7 +49,7 @@ scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/aut
 creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
 client = gspread.authorize(creds)
 
-mem = Member()
+mem = Member(client)
 tools = Tools()
 #vote = Vote()
 
@@ -210,13 +210,16 @@ def print_date_time():
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
-#@app.before_first_request
+def keep_alive():
+    client.login()
+
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
                 hour=9, minute=40)# args=[text]
+    job2 = scheduler.add_job(func=keep_alive, trigger="interval", minutes=59)
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
