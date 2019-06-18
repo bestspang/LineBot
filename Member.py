@@ -2,12 +2,6 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread, pprint
 from user import User
 
-users = [User(1, "best", "dsfgsdfdffff")]
-
-id_mapping = {u.id: u for u in users}
-name_mapping = {u.name: u for u in users}
-lineid_mapping = {u.line_id: u for u in users}
-
 class Member:
     def __init__(self):
         #self.name = name
@@ -17,12 +11,6 @@ class Member:
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
         creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
         self.client = gspread.authorize(creds)
-
-
-    # def authenticate(self, username, password):
-    #     user = username_mapping.get(username, None)
-    #     if user and (user.password == password)):
-    #         return user
 
     def member_rank(self,input):
         if is_member(input) and is_approve(input):

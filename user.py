@@ -14,9 +14,16 @@ class User:
         # creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
         # client = gspread.authorize(creds)
 
+    def get_sheet(self, spread, sheet):
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
+        client = gspread.authorize(creds)
+        sheet = client.open(spread).worksheet(sheet)
+        return sheet
+
     @classmethod
     def find_by_name(cls, name):
-        data = client.open('userCheckin').worksheet('userStatus').get_all_values()
+        data = ('userCheckin', 'userStatus').get_all_values()
         df = pd.DataFrame(data[1:], columns = data[0])
         try:
             #df[df['USER_KEY']==name]['USER_KEY'].iloc[0]
@@ -32,10 +39,7 @@ class User:
 
     @classmethod
     def find_by_id(cls, line_id):
-        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-        client = gspread.authorize(creds)
-        data = client.open('userCheckin').worksheet('userStatus').get_all_values()
+        data = ('userCheckin', 'userStatus').get_all_values()
         df = pd.DataFrame(data[1:], columns = data[0])
         try:
             #df[df['USER_KEY']==username]['USER_KEY'].iloc[0]

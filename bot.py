@@ -42,9 +42,6 @@ handler = WebhookHandler(config['line_bot']['handler'])
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
-
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
 client = gspread.authorize(creds)
@@ -195,10 +192,7 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
         return response.query_result.fulfillment_text
 
-@sched.scheduled_job('interval', seconds=5)
-def test_schedule():
-    print("yo!")
-
+#@sched.scheduled_job('interval', seconds=5)
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=9, minute=30)
 def print_date_time():
     # global date_time
@@ -269,7 +263,7 @@ def send_images_content(path):
 @app.route('/send_message', methods=['POST'])
 def send_message():
     message = request.form['message']
-    project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+    project_id = config['DIALOGFLOW_PROJECT_ID']['id']
     fulfillment_text = detect_intent_texts(project_id, "unique", message, 'th')
     response_text = { "message":  fulfillment_text }
     return jsonify(response_text)
@@ -342,7 +336,7 @@ def extractWord(text):
 
 def getSymbol(lists):
     for i in range(len(lists)):
-        if isthai(lists[i])['thai'] == 0: ### TO FIX TypeError: 'bool' object is not subscriptable
+        if isthai(lists[i]) == 0:#['thai'] ### TO FIX TypeError: 'bool' object is not subscriptable
             return lists[i].upper()
     return 0
 
@@ -539,7 +533,7 @@ def handle_message(event):
         if 'ทดลอง ' in text:
             price = 'นี้คือระบบ test : '
             textn = text.replace('ทดลอง ', '').replace('test ', '')
-            project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+            project_id = config['DIALOGFLOW_PROJECT_ID']['id']
             try:
                 fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
             except:
