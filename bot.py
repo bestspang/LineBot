@@ -45,19 +45,13 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
-# scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-# creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-# client = gspread.authorize(creds)
+scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
+client = gspread.authorize(creds)
 
-mem = Member()
+mem = Member(client)
 tools = Tools()
 #vote = Vote()
-
-def get_client():
-    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-    client = gspread.authorize(creds)
-    return client
 
 def check_opt(input, opt):
     if input == opt:
@@ -66,7 +60,6 @@ def check_opt(input, opt):
         return False
 
 def gsheet_to_csv(input, opt):
-    client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
     for i, worksheet in enumerate(sheet.worksheets()):
         filename = docid + '-worksheet' + str(i) + '.csv'
@@ -75,13 +68,11 @@ def gsheet_to_csv(input, opt):
             writer.writerows(worksheet.get_all_values())
 
 def is_working(input_id):
-    client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     return int(sheet.col_values(4)[1:][user_id.index(input_id)])
 
 def who_work():
-    client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_name = sheet.col_values(3)[1:]
     text = ""
@@ -98,7 +89,6 @@ def who_work():
     return text
 
 def checkin_out(input_id, type):
-    client = get_client()
     profile = line_bot_api.get_profile(input_id)
     now = datetime.datetime.now() + datetime.timedelta(seconds = 25200)
     sheet = client.open('userCheckin').worksheet('userStatus')
@@ -129,7 +119,6 @@ def checkin_out(input_id, type):
 
 
 def member_rank(input):
-    client = get_client()
     if mem.is_member(input) and is_approve(input):
         sheet = client.open('lineUser').worksheet('user')
         user_id = sheet.col_values(3)[1:]
@@ -138,28 +127,25 @@ def member_rank(input):
         return False
 
 def is_approve(input):
-    client = get_client()
-    sheet = client.open('lineUser').worksheet('user')
-    user_id = sheet.col_values(3)[1:]
-    if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
-        return True
-    else:
-        return False
+        sheet = client.open('lineUser').worksheet('user')
+        user_id = sheet.col_values(3)[1:]
+        if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
+            return True
+        else:
+            return False
 
 def add_member(input):
-    client = get_client()
-    sheet = client.open('lineUser').worksheet('user')
-    profile = line_bot_api.get_profile(input)
-    now = datetime.datetime.now()
-    row_num = len(sheet.col_values(3)[1:])
-    row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
-    index = row_num + 2
-    sheet.insert_row(row, index)
-    to = "C374667ff440b48857dafb57606ff4600"
-    line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
+        sheet = client.open('lineUser').worksheet('user')
+        profile = line_bot_api.get_profile(input)
+        now = datetime.datetime.now()
+        row_num = len(sheet.col_values(3)[1:])
+        row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
+        index = row_num + 2
+        sheet.insert_row(row, index)
+        to = "C374667ff440b48857dafb57606ff4600"
+        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
 def is_approve_new_member():
-    client = get_client()
     sheet = client.open('lineUser').worksheet('user')
     name = sheet.col_values(2)[-1]
     confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
@@ -174,7 +160,6 @@ def is_approve_new_member():
     template_message])
 
 def approve_member(boo):
-    client = get_client()
     if boo == 1:
         sheet = client.open('lineUser').worksheet('user')
         row_num = len(sheet.col_values(3)[1:])
@@ -225,6 +210,9 @@ def print_date_time():
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
+def keep_alive():
+    print("keep alive!")
+    client.login()
 
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
@@ -232,6 +220,7 @@ def init_scheduler():
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
                 hour=9, minute=40)# args=[text]
+    job2 = scheduler.add_job(func=keep_alive, trigger="interval", minutes=30)
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
@@ -461,7 +450,6 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('balance' in words_list or 'ยอดเงิน' in words_list):
-        client = get_client()
         sheet = client.open('AbbokIncomeAssesmentV02').sheet1
         pp = pprint.PrettyPrinter()
         balance = sheet.cell(23, 2).value
@@ -473,7 +461,6 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
-        client = get_client()
         urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
         headers = requests.utils.default_headers()
         headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
@@ -500,7 +487,6 @@ def handle_message(event):
         return 0
 
     if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
-        client = get_client()
         name = ["best", "แทน", "ทีม", "snook"]
         usern = None
         for i in words_list:
@@ -523,7 +509,6 @@ def handle_message(event):
         return 0
 
     if ('เพิิ่ม' in words_list or 'add' in words_list) and ('ข้อมูล' in words_list or 'data' in words_list):
-        client = get_client()
         newdata = text.split(' ')[-1]
         sheet = client.open('testSpreadsheet').sheet1
         pp = pprint.PrettyPrinter()
