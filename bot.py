@@ -18,7 +18,7 @@ from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 from threading import Thread, Event
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.schedulers.background import BlockingScheduler
 from Member import Member
 from Tools import Vote, Tools, RandomThread
 
@@ -48,6 +48,8 @@ os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
 client = gspread.authorize(creds)
+
+sched = BlockingScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
 
 mem = Member()
 tools = Tools()
@@ -193,11 +195,11 @@ def detect_intent_texts(project_id, session_id, text, language_code):
 
         return response.query_result.fulfillment_text
 
-# TODO : fix to make it start from today()
-# initialize scheduler with your preferred timezone
-# waking_time = datetime.date.today().strftime("%Y-%m-%d")+"T9:30:00"
-# date_time = datetime.datetime.strptime(str(waking_time), '%Y-%m-%dT%H:%M:%S')
+@sched.scheduled_job('interval', seconds=5)
+def test_schedule():
+    print("yo!")
 
+@sched.scheduled_job('cron', day_of_week='mon-fri', hour=9, minute=30)
 def print_date_time():
     # global date_time
     # date_time += datetime.timedelta(days=1)
@@ -210,28 +212,7 @@ def print_date_time():
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
-def keep_alive():
-    print("keep alive!")
-    client.login()
-
-def init_scheduler():
-    scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
-    #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
-    job = scheduler.add_job(print_date_time,"cron",
-                day_of_week='mon-fri',
-                hour=9, minute=40)# args=[text]
-    job2 = scheduler.add_job(func=keep_alive, trigger="interval", minutes=30)
-    scheduler.start()
-    # Shut down the scheduler when exiting the app
-    # atexit.register(lambda: scheduler.shutdown())
-
-if (not app.debug or os.environ.get('WERKZEUG_RUN_MAIN') == 'true'):
-    print("scheduler True!")
-    init_scheduler()
-
-else:
-    print("scheduler False!")
-
+sched.start()
 
 @app.route("/")
 def hello():
