@@ -46,7 +46,7 @@ os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
 client = gspread.authorize(creds)
 
 mem = Member(client)
@@ -211,6 +211,7 @@ def print_date_time():
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
 def keep_alive():
+    print("keep alive!")
     client.login()
 
 def init_scheduler():
@@ -219,7 +220,7 @@ def init_scheduler():
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
                 hour=9, minute=40)# args=[text]
-    job2 = scheduler.add_job(func=keep_alive, trigger="interval", minutes=59)
+    job2 = scheduler.add_job(func=keep_alive, trigger="interval", minutes=30)
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
