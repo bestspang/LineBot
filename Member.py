@@ -2,22 +2,16 @@ from oauth2client.service_account import ServiceAccountCredentials
 import gspread, pprint
 from user import User
 
-users = [User(1, "best", "dsfgsdfdffff")]
-
-id_mapping = {u.id: u for u in users}
-name_mapping = {u.name: u for u in users}
-lineid_mapping = {u.line_id: u for u in users}
-
 class Member:
-    def __init__(self, spread):
+    def __init__(self):
         #self.name = name
         #self.id = id
         #self.line_id = line_id
         #self.marks = []
-        #scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        #creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
-        #self.client = gspread.authorize(creds)
-        self.client = spread
+        scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        self.client = gspread.authorize(creds)
+
 
     # def authenticate(self, username, password):
     #     user = username_mapping.get(username, None)
@@ -38,11 +32,15 @@ class Member:
             return user_id
 
     def get_all_member_names(self):
-            sheet = self.client.open('userCheckin').worksheet('userStatus')
+            scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+            creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+            client = gspread.authorize(creds)
+            sheet = client.open('userCheckin').worksheet('userStatus')
             user_id = sheet.col_values(3)[1:]
             return user_id
 
     def get_key_by_name(self, input):
+
             key = get_all_member_ids()
             name = get_all_member_names()
             try:
@@ -52,7 +50,10 @@ class Member:
             return line_key
 
     def is_member(self,input):
-            sheet = self.client.open('lineUser').worksheet('user')
+            scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
+            creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+            client = gspread.authorize(creds)
+            sheet = client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             if input in user_id:
                 #sheet.col_values(4)[1:][user_id.index(input)]
