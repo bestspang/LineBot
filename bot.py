@@ -372,7 +372,7 @@ def extractWord(text):
 
 def getSymbol(lists):
     for i in range(len(lists)):
-        if isthai(lists[i])['thai'] == 0: ### TO FIX TypeError: 'bool' object is not subscriptable
+        if isthai(lists[i]) == 0: ### TO FIX TypeError: 'bool' object is not subscriptable
             return lists[i].upper()
     return 0
 
