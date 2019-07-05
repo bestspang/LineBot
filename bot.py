@@ -220,7 +220,7 @@ def print_date_time():
     to = "C374667ff440b48857dafb57606ff4600" #group
     to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a",
             "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09",
-            "Uc1f00d375dd0d706511f4957e4ccc491"]
+            "Uc1f00d375dd0d706511f4957e4ccc491", "Ube7c6d3358f6994218ffb623d4d8a06e"]
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
@@ -726,7 +726,7 @@ def handle_message(event):
                 ]
             )
 
-    if text == 'member':
+    if text == 'member' or text == '!member':
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
             member = "You are not a member!"
