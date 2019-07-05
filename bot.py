@@ -597,7 +597,8 @@ def handle_message(event):
                     try:
                         int(textn)
                     except:
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"))
+                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ![1]"))
+                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="ERROR: {}, {}".format(text, textn)))
                         return 0
 
                     number = os.getenv('OTP_BACKUP')
@@ -607,7 +608,7 @@ def handle_message(event):
                     else:
                         response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
                 else:
-                    response_text = "กรุณาพิมพ์ check หรือ checkin ตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
+                    response_text = "กรุณาพิมพ์ check หรือ checkin ตามด้วยเว้นวรรคและเลข 6 หลักครับ![2]"
             else:
                 response_text = "ไม่สามารถ check-in ได้เนื่องจากท่านยังไม่ได้ทำการ check-out!"
         else:
