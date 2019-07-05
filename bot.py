@@ -587,7 +587,7 @@ def handle_message(event):
 
 # test decorator
 
-    if 'check' in words_list or 'checkin' in words_list:
+    if 'check' in words_list or '!check' in words_list:
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
@@ -688,7 +688,7 @@ def handle_message(event):
         return 0
 
     ##################
-    if text == 'profile':
+    if text == 'profile' or text == '!profile':
         if isinstance(event.source, SourceUser):
             profile = line_bot_api.get_profile(event.source.user_id)
             line_bot_api.reply_message(

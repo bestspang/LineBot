@@ -33,6 +33,7 @@ $(document).ready(function(){
         $('#log2').html(numbers_string);
     });
 });
+
 window.onload = function() {
 var Clock = (function(){
 
