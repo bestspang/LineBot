@@ -592,7 +592,7 @@ def handle_message(event):
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
             if not is_working(event.source.user_id):
-                if 'check ' in text or 'checkin ' in text:
+                if 'check ' in text or 'checkin ' in text or text[:5] == 'check':
                     textn = text.replace('checkin ', '').replace('check ', '')
                     try:
                         int(textn)
