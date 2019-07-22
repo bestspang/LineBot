@@ -1,15 +1,16 @@
 from oauth2client.service_account import ServiceAccountCredentials
-import gspread, pprint, functools
+import gspread, pprint, functools, csv, datetime
 from user import User
 
 class Member:
-    def __init__(self):
+    def __init__(self, line_bot_api):
         #self.name = name
         #self.id = id
         #self.line_id = line_id
         #self.marks = []
         scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-        creds = ServiceAccountCredentials.from_json_keyfile_name('BPLINEBOT-57c70064e9b9.json', scope)
+        creds = ServiceAccountCredentials.from_json_keyfile_name('static/key/BPLINEBOT-57c70064e9b9.json', scope)
+        self.line_bot_api = line_bot_api
         self.client = gspread.authorize(creds)
 
     def check_permission(number):
@@ -24,36 +25,36 @@ class Member:
         return my_decorator
 
     def get_all_member_ids(self):
-            sheet = self.client.open('userCheckin').worksheet('userStatus')
-            user_id = sheet.col_values(2)[1:]
-            return user_id
+        sheet = self.client.open('userCheckin').worksheet('userStatus')
+        user_id = sheet.col_values(2)[1:]
+        return user_id
 
     def get_all_member_names(self):
-            sheet = self.client.open('userCheckin').worksheet('userStatus')
-            user_id = sheet.col_values(3)[1:]
-            return user_id
+        sheet = self.client.open('userCheckin').worksheet('userStatus')
+        user_id = sheet.col_values(3)[1:]
+        return user_id
 
     def get_key_by_name(self, input):
-            key = get_all_member_ids()
-            name = get_all_member_names()
-            try:
-                line_key = key[name.index(input)]
-            except:
-                return False
-            return line_key
+        key = self.get_all_member_ids()
+        name = self.get_all_member_names()
+        try:
+            line_key = key[name.index(input)]
+        except:
+            return False
+        return line_key
 
-    def is_member(self,input):
-            sheet = self.client.open('lineUser').worksheet('user')
-            user_id = sheet.col_values(3)[1:]
-            if input in user_id:
-                #sheet.col_values(4)[1:][user_id.index(input)]
-                return True
-            else:
-                return False
-            #pp.pprint(balance)
-            #sheet = client.open('testSpreadsheet').sheet1
-            #pp = pprint.PrettyPrinter()
-            #sheet.update_cell(1, 1, newdata)
+    def is_member(self, input):
+        sheet = self.client.open('lineUser').worksheet('user')
+        user_id = sheet.col_values(3)[1:]
+        if input in user_id:
+            # sheet.col_values(4)[1:][user_id.index(input)]
+            return True
+        else:
+            return False
+        # pp.pprint(balance)
+        # sheet = client.open('testSpreadsheet').sheet1
+        # pp = pprint.PrettyPrinter()
+        # sheet.update_cell(1, 1, newdata)
 
     @classmethod
     def friend(cls, origin, friend_name, *args, **kwargs):
@@ -65,21 +66,24 @@ class Member:
         else:
             return False
 
-    def gsheet_to_csv(input, opt):
-        sheet = client.open('userCheckin').worksheet('userStatus')
-        for i, worksheet in enumerate(sheet.worksheets()):
-            filename = docid + '-worksheet' + str(i) + '.csv'
-            with open(filename, 'w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerows(worksheet.get_all_values())
+    # @staticmethod
+    # def gsheet_to_csv(self, input, opt):
+    #     sheet = self.client.open('userCheckin').worksheet('userStatus')
+    #     for i, worksheet in enumerate(sheet.worksheets()):
+    #         filename = docid + '-worksheet' + str(i) + '.csv'
+    #         with open(filename, 'w', newline='') as f:
+    #             writer = csv.writer(f)
+    #             writer.writerows(worksheet.get_all_values())
 
-    def is_working(input_id):
-        sheet = client.open('userCheckin').worksheet('userStatus')
+    @staticmethod
+    def is_working(self, input_id):
+        sheet = self.client.open('userCheckin').worksheet('userStatus')
         user_id = sheet.col_values(2)[1:]
         return int(sheet.col_values(4)[1:][user_id.index(input_id)])
 
-    def who_work():
-        sheet = client.open('userCheckin').worksheet('userStatus')
+    @staticmethod
+    def who_work(self):
+        sheet = self.client.open('userCheckin').worksheet('userStatus')
         user_name = sheet.col_values(3)[1:]
         text = ""
         is_in = sheet.col_values(4)[1:]
@@ -94,35 +98,39 @@ class Member:
             text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
         return text
 
-    def member_rank(input):
-        if mem.is_member(input) and is_approve(input):
-            sheet = client.open('lineUser').worksheet('user')
+    @staticmethod
+    def member_rank(self, input):
+        if self.is_member(input) and self.is_approve(input):
+            sheet = self.client.open('lineUser').worksheet('user')
             user_id = sheet.col_values(3)[1:]
             return sheet.col_values(6)[1:][user_id.index(input)]
         else:
             return False
 
-    def is_approve(input):
-            sheet = client.open('lineUser').worksheet('user')
-            user_id = sheet.col_values(3)[1:]
-            if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
-                return True
-            else:
-                return False
+    @staticmethod
+    def is_approve(self, input):
+        sheet = self.client.open('lineUser').worksheet('user')
+        user_id = sheet.col_values(3)[1:]
+        if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
+            return True
+        else:
+            return False
 
-    def add_member(input):
-            sheet = client.open('lineUser').worksheet('user')
-            profile = line_bot_api.get_profile(input)
-            now = datetime.datetime.now()
-            row_num = len(sheet.col_values(3)[1:])
-            row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
-            index = row_num + 2
-            sheet.insert_row(row, index)
-            to = "C374667ff440b48857dafb57606ff4600"
-            line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
+    @staticmethod
+    def add_member(self, input):
+        sheet = self.client.open('lineUser').worksheet('user')
+        profile = self.line_bot_api.get_profile(input)
+        now = datetime.datetime.now()
+        row_num = len(sheet.col_values(3)[1:])
+        row = [row_num + 1, profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
+        index = row_num + 2
+        sheet.insert_row(row, index)
+        to = "C374667ff440b48857dafb57606ff4600"
+        self.line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
-    def is_approve_new_member():
-        sheet = client.open('lineUser').worksheet('user')
+    @staticmethod
+    def is_approve_new_member(self):
+        sheet = self.client.open('lineUser').worksheet('user')
         name = sheet.col_values(2)[-1]
         confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
             PostbackAction(label='Yes',text='Yes!',data='member_yes'),
@@ -131,26 +139,27 @@ class Member:
         template_message = TemplateSendMessage(
             alt_text='Confirm alt text', template=confirm_template)
         to = "U7612d77bbca83f04d6acf5e27333edeb"
-        line_bot_api.push_message(to, [TextSendMessage(text="คุณ "+name),
+        self.line_bot_api.push_message(to, [TextSendMessage(text="คุณ "+name),
         TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
         template_message])
 
-    def approve_member(boo):
+    def approve_member(self, boo):
         if boo == 1:
-            sheet = client.open('lineUser').worksheet('user')
+            sheet = self.client.open('lineUser').worksheet('user')
             row_num = len(sheet.col_values(3)[1:])
             sheet.update_cell(row_num+1, 4, "APPROVE")
             sheet.update_cell(row_num+1, 6, "1")
         else:
             pass
 
-    def checkin_out(input_id, type):
-        profile = line_bot_api.get_profile(input_id)
+    @staticmethod
+    def checkin_out(self, input_id, type):
+        profile = self.line_bot_api.get_profile(input_id)
         now = datetime.datetime.now() + datetime.timedelta(seconds = 25200)
-        sheet = client.open('userCheckin').worksheet('userStatus')
+        sheet = self.client.open('userCheckin').worksheet('userStatus')
         user_id = sheet.col_values(2)[1:]
         user_name = sheet.col_values(3)[1:]
-        sheet2 = client.open('userCheckin').worksheet('log')
+        sheet2 = self.client.open('userCheckin').worksheet('log')
         row_num = len(sheet2.col_values(1)[1:])
         #int(sheet.col_values(4)[1:][user_id.index(input_id)])
         # check is_in
@@ -169,9 +178,9 @@ class Member:
             total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
             total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
             sheet.update_cell(user_id.index(input_id) + 2, 5, '')
-            line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
+            self.line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
 
-        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
+        self.line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
 
 ####
 

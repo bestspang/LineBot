@@ -4,23 +4,16 @@ from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
-import requests, random, os, errno, sys, configparser, csv, atexit
+import requests, random, os, errno, configparser
 import dialogflow, gspread, pprint, datetime, functools, time #tempfile
-import numpy as np
-import pandas as pd
-from pythainlp.tokenize import word_tokenize
-from pythainlp.util import isthai
-from bs4 import BeautifulSoup as soup
-from html.parser import HTMLParser
-from urllib.request import urlopen as uReq
-from urllib.request import urlretrieve as uRet
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
 from linebot.models import *
 from threading import Thread, Event
 from apscheduler.schedulers.background import BlockingScheduler
-from Member import Member
-from Tools import Vote, Tools, RandomThread, Hoon
+from models.Member import Member
+from models.Tools import Vote, Tools, RandomThread, Hoon
+from models.Text import Text
 
 __author__ = 'bestspang'
 
@@ -43,130 +36,17 @@ handler = WebhookHandler(config['line_bot']['handler'])
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('static/key/bplinebot-3ccea59ad6d6.json', scope)
 client = gspread.authorize(creds)
 
 sched = BlockingScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
 
-mem = Member()
+mem = Member(line_bot_api)
+text = Text(line_bot_api)
 tools = Tools()
 hoon = Hoon()
 #vote = Vote()
 
-def check_opt(input, opt):
-    if input == opt:
-        return True
-    else:
-        return False
-
-def gsheet_to_csv(input, opt):
-    sheet = get_sheet('userCheckin', 'userStatus')
-    for i, worksheet in enumerate(sheet.worksheets()):
-        filename = docid + '-worksheet' + str(i) + '.csv'
-        with open(filename, 'w', newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(worksheet.get_all_values())
-
-def is_working(input_id):
-    sheet = client.open('userCheckin').worksheet('userStatus')
-    user_id = sheet.col_values(2)[1:]
-    return int(sheet.col_values(4)[1:][user_id.index(input_id)])
-
-def who_work():
-    sheet = client.open('userCheckin').worksheet('userStatus')
-    user_name = sheet.col_values(3)[1:]
-    text = ""
-    is_in = sheet.col_values(4)[1:]
-    is_in = [int(i) for i in is_in]
-    if sum(is_in) > 0:
-        text += "ที่ออฟฟิศมี : \n"
-        for i in range(len(is_in)):
-            if is_in[i] == 1:
-                text += "{}\n".format(user_name[i])
-        text += 'กำลังทำงานครับผม!'
-    else:
-        text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
-    return text
-
-def checkin_out(input_id, type):
-    profile = line_bot_api.get_profile(input_id)
-    now = datetime.datetime.now() + datetime.timedelta(seconds = 25200)
-    sheet = client.open('userCheckin').worksheet('userStatus')
-    user_id = sheet.col_values(2)[1:]
-    user_name = sheet.col_values(3)[1:]
-    sheet2 = client.open('userCheckin').worksheet('log')
-    row_num = len(sheet2.col_values(1)[1:])
-    #int(sheet.col_values(4)[1:][user_id.index(input_id)])
-    # check is_in
-    sheet.update_cell(user_id.index(input_id) + 2, 4, type)
-    # update log
-    row = [row_num + 1,now.strftime('%Y/%m/%d'),now.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
-    index = row_num + 2
-    sheet2.insert_row(row, index)
-    to = "C374667ff440b48857dafb57606ff4600"
-    to_user = input_id
-    if type == "1":
-        text = "Check-In!"
-        sheet.update_cell(user_id.index(input_id) + 2, 5, now.strftime("%I:%M %p"))
-    elif type == "0":
-        text = "Check-out!"
-        total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
-        total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
-        sheet.update_cell(user_id.index(input_id) + 2, 5, '')
-        line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
-
-    line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้ทำการ ' + text))
-
-
-def member_rank(input):
-    if mem.is_member(input) and is_approve(input):
-        sheet = client.open('lineUser').worksheet('user')
-        user_id = sheet.col_values(3)[1:]
-        return sheet.col_values(6)[1:][user_id.index(input)]
-    else:
-        return False
-
-def is_approve(input):
-        sheet = client.open('lineUser').worksheet('user')
-        user_id = sheet.col_values(3)[1:]
-        if input in user_id and sheet.col_values(4)[1:][user_id.index(input)] == "APPROVE":
-            return True
-        else:
-            return False
-
-def add_member(input):
-        sheet = client.open('lineUser').worksheet('user')
-        profile = line_bot_api.get_profile(input)
-        now = datetime.datetime.now()
-        row_num = len(sheet.col_values(3)[1:])
-        row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
-        index = row_num + 2
-        sheet.insert_row(row, index)
-        to = "C374667ff440b48857dafb57606ff4600"
-        line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
-
-def is_approve_new_member():
-    sheet = client.open('lineUser').worksheet('user')
-    name = sheet.col_values(2)[-1]
-    confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
-        PostbackAction(label='Yes',text='Yes!',data='member_yes'),
-        PostbackAction(label='No',text='No!',data='member_no'),
-    ])
-    template_message = TemplateSendMessage(
-        alt_text='Confirm alt text', template=confirm_template)
-    to = "U7612d77bbca83f04d6acf5e27333edeb"
-    line_bot_api.push_message(to, [TextSendMessage(text="คุณ "+name),
-    TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
-    template_message])
-
-def approve_member(boo):
-    if boo == 1:
-        sheet = client.open('lineUser').worksheet('user')
-        row_num = len(sheet.col_values(3)[1:])
-        sheet.update_cell(row_num+1, 4, "APPROVE")
-        sheet.update_cell(row_num+1, 6, "1")
-    else:
-        pass
 
 def make_static_tmp_dir():
     try:
@@ -176,22 +56,6 @@ def make_static_tmp_dir():
             pass
         else:
             raise
-
-def detect_intent_texts(project_id, session_id, text, language_code):
-    import dialogflow_v2 as dialogflow
-    # key_file_path = "./BPLINEBOT-0106b42afbf3.json"
-    # credentials = Credentials.from_service_account_file(key_file_path)
-    session_client = dialogflow.SessionsClient()
-    session = session_client.session_path(project_id, session_id)
-
-    if text:
-        text_input = dialogflow.types.TextInput(
-            text=text, language_code=language_code)
-        query_input = dialogflow.types.QueryInput(text=text_input)
-        response = session_client.detect_intent(
-            session=session, query_input=query_input)
-
-        return response.query_result.fulfillment_text
 
 #@sched.scheduled_job('interval', seconds=5)
 @sched.scheduled_job('cron', day_of_week='mon-fri', hour=9, minute=30)
@@ -216,7 +80,7 @@ def hello():
 
 @app.route("/notify")
 def call_func():
-    is_approve_new_member()
+    mem.is_approve_new_member()
     return render_template('index.html')
 
 @socketio.on('connect', namespace='/test')
@@ -265,647 +129,14 @@ def send_images_content(path):
 def send_message():
     message = request.form['message']
     project_id = config['DIALOGFLOW_PROJECT_ID']['id']
-    fulfillment_text = detect_intent_texts(project_id, "unique", message, 'th')
+    fulfillment_text = Text.detect_intent_texts(project_id, "unique", message, 'th')
     response_text = { "message":  fulfillment_text }
     return jsonify(response_text)
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    global number
-    text = event.message.text.lower()
-    words_list = tools.extractWord(event.message.text)
+    text.message_handler(event)
 
-    if 'หุ้น' in words_list or 'ราคา' in words_list:
-        symbol = hoon.getSymbol(words_list)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=symbol))
-        return 0
-
-    if 'trackid' in words_list or 'รหัส' in words_list:
-        price = hoon.get_shipping_stat(event.message.text)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price))
-        return 0
-
-    if 'ขอ' in words_list and ('balance' in words_list or 'ยอดเงิน' in words_list):
-        sheet = client.open('AbbokIncomeAssesmentV02').sheet1
-        pp = pprint.PrettyPrinter()
-        balance = sheet.cell(23, 2).value
-        #pp.pprint(balance)
-        price = "ยอดเงินในบัญชีตอนนี้มีทั้งหมด {} บาทครับผม!".format(balance)
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price))
-        return 0
-
-    if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
-        urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
-        headers = requests.utils.default_headers()
-        headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',})
-        #site_request = requests.get(url, headers=headers)
-        uRet(urls, "static/image.png")
-        sheet = client.open('AbbokIncomeAssesmentV02').worksheet("Summary2")
-        #pp = pprint.PrettyPrinter()
-        expense = sheet.cell(3, 14).value
-        income = sheet.cell(2, 14).value
-
-        #pp.pprint(balance)
-        price = "รายจ่ายทั้งหมด {} บาท\nรายรับทั้งหมด {} บาท".format(expense, income)
-
-        url = request.url_root + '/static/image.png'
-        app.logger.info("url=" + url)
-        line_bot_api.reply_message(
-            event.reply_token,
-            [
-            ImageSendMessage(url, url),
-            TextSendMessage(text=price)
-            ]
-        )
-
-        return 0
-
-    if 'ขอ' in words_list and ('เงินเดือน' in words_list or 'รายได้' in words_list):
-        name = ["best", "แทน", "ทีม", "snook"]
-        usern = None
-        for i in words_list:
-            if i in name:
-                usern = i
-        if usern == None:
-            price = "กรุณาบอกชื่อด้วยครับ"
-        else:
-            sheet = client.open('AbbokIncomeAssesmentV02').get_worksheet(2)
-            pp = pprint.PrettyPrinter()
-            num = name.index(usern)
-            balance = sheet.cell(num+2, 9).value
-            #pp.pprint(balance)
-            price = "เงินเดือนของ {} จะได้รับในเดือนนี้ {} บาทครับผม!".format(usern, balance)
-
-        usern = None
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price))
-        return 0
-
-    if ('เพิิ่ม' in words_list or 'add' in words_list) and ('ข้อมูล' in words_list or 'data' in words_list):
-        newdata = text.split(' ')[-1]
-        sheet = client.open('testSpreadsheet').sheet1
-        pp = pprint.PrettyPrinter()
-        sheet.update_cell(1, 1, newdata)
-        # row = ["I'm","inserting","a","new","row","into","a,","Spreadsheet","using","Python"]
-        # index = 3
-        # sheet.insert_row(row, index)
-        # sheet.row_count
-        # sheet.delete_row(1)
-        balance = sheet.cell(1, 1).value
-        price = "เปลี่ยนข้อมูลเป็น : {} ".format(balance)
-
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=price))
-        return 0
-
-    if event.message.text.lower().replace(' ','') == 'Most Active Value'.lower().replace(' ',''):
-        line_bot_api.reply_message(event.reply_token,
-            TextSendMessage(text='Most Active Value'))
-        return 0
-    if event.message.text.lower().replace(' ','') == 'Most Active Volume'.lower().replace(' ',''):
-        line_bot_api.reply_message(event.reply_token,
-            TextSendMessage(text='Most Active Volume'))
-        return 0
-    if event.message.text.lower().replace(' ','') == 'Top Gainers'.lower().replace(' ',''):
-        line_bot_api.reply_message(event.reply_token,
-            TextSendMessage(text='Top Gainers'))
-        return 0
-    if event.message.text.lower().replace(' ','') == 'Top Losers'.lower().replace(' ',''):
-        line_bot_api.reply_message(event.reply_token,
-            TextSendMessage(text='Top Losers'))
-        return 0
-
-    if 'คำคม' in words_list or 'quote' in words_list:
-        price = 'นี้คือระบบ test ครับ'
-        quote = tools.getQuote()
-        # line_bot_api.reply_message(
-        #     event.reply_token,
-        #     TextSendMessage(text=price))
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=quote))
-        return 0
-#fix google dialogflow
-    if 'ทดลอง' in words_list:
-        if 'ทดลอง ' in text:
-            price = 'นี้คือระบบ test : '
-            textn = text.replace('ทดลอง ', '').replace('test ', '')
-            project_id = config['DIALOGFLOW_PROJECT_ID']['id']
-            try:
-                fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-            except:
-                fulfillment_text = "ระบบผิดพลาด"
-                pass
-            response_text = fulfillment_text
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=response_text))
-        return 0
-
-# test decorator
-
-    if 'check' in words_list or 'checkin' in words_list:
-        rank = member_rank(event.source.user_id)
-        response_text = "รหัส(code)ไม่ถูกต้องครับ!"
-        if rank in "01":
-            if not is_working(event.source.user_id):
-                if 'check ' in text or 'checkin ' in text:
-                    textn = text.replace('checkin ', '').replace('check ', '')
-                    try:
-                        int(textn)
-                    except:
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ!"))
-                        return 0
-
-                    number = os.getenv('OTP_BACKUP')
-                    if check_opt(textn, number) and textn is not None and len(textn) == 6:
-                        checkin_out(event.source.user_id,"1")
-                        response_text = "Check in สำเร็จแล้วครับ!"
-                    else:
-                        response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
-                else:
-                    response_text = "กรุณาพิมพ์ check หรือ checkin ตามด้วยเว้นวรรคและเลข 6 หลักครับ!"
-            else:
-                response_text = "ไม่สามารถ check-in ได้เนื่องจากท่านยังไม่ได้ทำการ check-out!"
-        else:
-            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text))
-        return 0
-
-    if 'out' in words_list or 'checkout' in words_list:
-        rank = member_rank(event.source.user_id)
-        response_text = "รหัส(code)ไม่ถูกต้องครับ!"
-        if rank in "01":
-            if is_working(event.source.user_id):
-                checkin_out(event.source.user_id,"0")
-                response_text = "Check out สำเร็จแล้วครับ!"
-            else:
-                response_text = "ไม่สามารถ check-out ได้เนื่องจาก\nท่านยังไม่ได้ทำการ check-in!"
-        else:
-            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=response_text))
-        return 0
-
-    if text == '!test':
-        #is_approve_new_member()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=text))
-        return 0
-
-    if text == '!help':
-        helpt = ["[จำเป็น]\n'!help'\n'check'or'checkin'-OTP\n'out'or'checkout'\n'ขอ'&ยอดเงิน'or'balance'\n'ขอ'&'เงินเดือน'or'รายได้'-\n'ขอ'&'ฟอร์ม'or'แบบฟอร์ม'\n'ขอ'&'เมนู'or'เมนูอื่นๆ'\n'ขอสรุปค่าใช้จ่าย'",
-        "[ทั่วไป]\n'Abbok'\n'member'\n'ใคร'&'ทำงานอยู่'or'อยู่ที่ทำงาน'\n'trackid'or'รหัส'-รหัสไปรษณี\n'ราคา'or'หุ้น'-QUOTE\n'คำคม'or'quote'",
-        "[ทดลอง]\n'!test'\n'เพิ่มข้อมูล'or'add data'-data\n'ทดลอง'-ประโยคเพื่อคุย\n'cast'or'castto'-t\n'profile'\n'!vote'"]
-        line_bot_api.reply_message(
-            event.reply_token,[
-            TextSendMessage(text=helpt[0]),
-            TextSendMessage(text=helpt[1]),
-            TextSendMessage(text=helpt[2])])
-        return 0
-
-    if 'ใคร' in words_list and ('ทำงานอยู่' in text or 'อยู่ที่ทำงาน' in text):
-        text = who_work()
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=text))
-        return 0
-
-    if 'cast' in words_list or 'castto' in words_list:
-        rank = member_rank(event.source.user_id)
-        if rank in "0":
-            if 'cast ' in text or 'castto ' in text:
-                textn = text.replace('cast ', '').replace('castto ', '')
-                to = "C374667ff440b48857dafb57606ff4600"
-                line_bot_api.push_message(to, TextSendMessage(text=textn))
-            else:
-                response_text = "กรุณาพิมพ์ cast หรือ castto\nตามด้วยประโยคที่ต้องการเผยแพร่!"
-        else:
-            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
-
-        return 0
-
-    ce = random.randint(1,10)
-    if 'แบม' in words_list or 'บี้' in words_list:
-        texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=texts[random.randint(0,7)]))
-        return 0
-
-    if 'บุ๊ค' in words_list or 'book' in words_list or 'บุ๊ก' in words_list:
-        texts = ['ตูดหมึก', 'จังกะเป', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กแว๊น', 'กิ๊บป่อง', 'ผีบ้า']
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=texts[random.randint(0,7)]))
-        return 0
-
-    ##################
-    if text == 'profile':
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text='User id: ' + event.source.user_id),
-                    TextSendMessage(text='Display name: ' + profile.display_name),
-                    TextSendMessage(text='Status message: ' + profile.status_message)
-                ]
-            )
-
-        elif isinstance(event.source, SourceGroup):
-            #member_ids_res = line_bot_api.get_group_member_ids(event.source.group_id)
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text="Bot is in a Group!"),
-                    TextSendMessage(text='Group id: ' + event.source.group_id),
-                    #TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
-                ]
-            )
-
-        elif isinstance(event.source, SourceRoom):
-            #member_ids_res = line_bot_api.get_room_member_ids(event.source.room_id)
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text="Bot is in a Room!"),
-                    TextSendMessage(text='Room id: ' + event.source.room_id),
-                    #TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
-                ]
-            )
-
-        else:
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text="Bot can't use profile API without user ID")
-                ]
-            )
-
-    if text == 'member':
-        if isinstance(event.source, SourceUser):
-            profile = line_bot_api.get_profile(event.source.user_id)
-            member = "You are not a member!"
-            if mem.is_member(event.source.user_id) and is_approve(event.source.user_id):
-                member = "You are a member!"
-                carousel_template = CarouselTemplate(columns=[
-                    CarouselColumn(text='Member Setting', title='เมนูหลัก', actions=[
-                        URIAction(label='ข้อมูลสมาชิก', uri='https://www.google.com'),
-                        URIAction(label='เปลี่ยนแปลงข้อมูล', uri='https://www.google.com'),
-                        PostbackAction(label='Coming soon..', data='comingsoon')
-                    ]),
-                ])
-                template_member = TemplateSendMessage(
-                    alt_text='Carousel alt text', template=carousel_template)
-                line_bot_api.reply_message(
-                    event.reply_token, [
-                        TextSendMessage(text='Hello! ' + profile.display_name),
-                        TextSendMessage(text=member),
-                        template_member
-                    ]
-                )
-            elif mem.is_member(event.source.user_id) and not is_approve(event.source.user_id):
-                member = "your application is waiting to be approve!\nplease wait!"
-                line_bot_api.reply_message(
-                    event.reply_token, [
-                        TextSendMessage(text='Hello! ' + profile.display_name),
-                        TextSendMessage(text=member)
-                    ]
-                )
-            else:
-                confirm_template = ConfirmTemplate(text='ต้องการสมัครสมาชิกหรือไหม?', actions=[
-                    PostbackAction(label='Yes',text='Yes!',data='yes'),
-                    PostbackAction(label='No',text='No!',data='no'),
-                    #MessageAction(label='Yes', text='Yes!'),
-                    #MessageAction(label='No', text='No!'),
-                ])
-                template_message = TemplateSendMessage(
-                    alt_text='Confirm alt text', template=confirm_template)
-                line_bot_api.reply_message(event.reply_token, [
-                    TextSendMessage(text='Hello! ' + profile.display_name),
-                    TextSendMessage(text=member),
-                    template_message
-                ])
-                print(event.message.text.lower())
-
-        elif isinstance(event.source, SourceGroup):
-            #member_ids_res = line_bot_api.get_group_member_ids(event.source.group_id)
-            line_bot_api.reply_message(
-                event.reply_token, [
-                    TextSendMessage(text="Bot is in a Group!"),
-                    TextSendMessage(text='Group id: ' + event.source.group_id),
-                    #TextSendMessage(text='Member ids: ' + str(member_ids_res.member_ids))
-                ]
-            )
-
-    elif text == 'quota':
-        quota = line_bot_api.get_message_quota()
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='type: ' + quota.type),
-                TextSendMessage(text='value: ' + str(quota.value))
-            ]
-        )
-    elif text == 'quota_consumption':
-        quota_consumption = line_bot_api.get_message_quota_consumption()
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='total usage: ' + str(quota_consumption.total_usage)),
-            ]
-        )
-    elif text == 'ขอชื่อพนักงาน' or text == 'ขอชื่อสมาชิิก':
-        textn = mem.get_all_member_names()
-        text = ""
-        for i in textn:
-            text += i + "\n"
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text=text),
-            ]
-        )
-    elif text == 'push':
-        line_bot_api.push_message(
-            event.source.user_id, [
-                TextSendMessage(text='PUSH!'),
-            ]
-        )
-    elif text == 'multicast':
-        line_bot_api.multicast(
-            [event.source.user_id], [
-                TextSendMessage(text='THIS IS A MULTICAST MESSAGE'),
-            ]
-        )
-    elif text == 'broadcast':
-        line_bot_api.broadcast(
-            [
-                TextSendMessage(text='THIS IS A BROADCAST MESSAGE'),
-            ]
-        )
-    elif text.startswith('broadcast '):  # broadcast 20190505
-        date = text.split(' ')[1]
-        print("Getting broadcast result: " + date)
-        result = line_bot_api.get_message_delivery_broadcast(date)
-        line_bot_api.reply_message(
-            event.reply_token, [
-                TextSendMessage(text='Number of sent broadcast messages: ' + date),
-                TextSendMessage(text='status: ' + str(result.status)),
-                TextSendMessage(text='success: ' + str(result.success)),
-            ]
-        )
-    elif text == 'bye':
-        if isinstance(event.source, SourceGroup):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_group(event.source.group_id)
-        elif isinstance(event.source, SourceRoom):
-            line_bot_api.reply_message(
-                event.reply_token, TextSendMessage(text='Leaving group'))
-            line_bot_api.leave_room(event.source.room_id)
-        else:
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text="Bot can't leave from 1:1 chat"))
-
-    elif text == 'image':
-        url = request.url_root + '/static/doge.jpg'
-        app.logger.info("url=" + url)
-        line_bot_api.reply_message(
-            event.reply_token,
-            ImageSendMessage(url, url)
-        )
-    elif text == 'confirm':
-        confirm_template = ConfirmTemplate(text='Do it?', actions=[
-            MessageAction(label='Yes', text='Yes!'),
-            MessageAction(label='No', text='No!'),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Confirm alt text', template=confirm_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-    elif text == 'buttons':
-        buttons_template = ButtonsTemplate(
-            title='My buttons sample', text='Hello, my buttons', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping'),
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-    elif text == '!vote':
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text="ระบบโหวตเร็วๆนี้"))
-
-    elif 'ขอ' in words_list and ('ฟอร์ม' in words_list or 'แบบฟอร์ม' in words_list):
-        buttons_template = ButtonsTemplate(
-            title='แบบฟอร์มต่างๆ', text='โปรดเลือกด้านล่าง', actions=[
-                URIAction(label='ใบลา', uri='https://forms.gle/hnrN52QHrwdMZwBy6'),
-                URIAction(label='ใบติดต่อลูกค้า', uri='https://forms.gle/qheFfQVA2chNTfRD9'),
-                URIAction(label='ใบเบิกเงิน', uri='https://forms.gle/junKJvXto2wXmm5e7'),
-                URIAction(label='ใบ Feed Back', uri='https://forms.gle/JfWnr2oRdoXrnXmL8')
-            ])
-        template_message = TemplateSendMessage(
-            alt_text='Buttons alt text', template=buttons_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-    elif 'ขอ' in words_list and ('เมนู' in words_list or 'เมนูอื่นๆ' in words_list):
-        carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='Page 1', title='เมนูหลัก', actions=[
-                URIAction(label='ไปยัง NAS', uri='http://bestspang.quickconnect.to'),
-                URIAction(label='Trello', uri='https://trello.com/b/0WqzlKN6'),
-                PostbackAction(label='ใบร่างใบเสนอราคา', data='comingsoon')
-            ]),
-            CarouselColumn(text='Page 2', title='อื่นๆ', actions=[
-                URIAction(label='Abbok Login', uri='https://www.abbok.net/login'),
-                URIAction(label='Fact Sheet', uri='https://docs.google.com/spreadsheets/d/1VEkNq4wPStfJ6Zfp3BOluY3hAkoP1V2AwkOmMImDU7o/edit?usp=sharing'),
-                PostbackAction(label='ไม่มีไร', data='nothing')
-            ]),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-
-    elif text == 'carousel':
-        carousel_template = CarouselTemplate(columns=[
-            CarouselColumn(text='hoge1', title='fuga1', actions=[
-                URIAction(label='Go to line.me', uri='https://line.me'),
-                PostbackAction(label='ping', data='ping'),
-                MessageAction(label='ใบร่างใบเสนอราคา', text='Coming Soon!'),
-                MessageAction(label='ไม่มีไร', text='จ่ะ')
-            ]),
-            CarouselColumn(text='hoge2', title='fuga2', actions=[
-                PostbackAction(label='ping with text', data='ping', text='ping'),
-                MessageAction(label='Translate Rice', text='米')
-            ]),
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='Carousel alt text', template=carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'image_carousel':
-        image_carousel_template = ImageCarouselTemplate(columns=[
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='datetime',
-                                                            data='datetime_postback',
-                                                            mode='datetime')),
-            ImageCarouselColumn(image_url='https://via.placeholder.com/1024x1024',
-                                action=DatetimePickerAction(label='date',
-                                                            data='date_postback',
-                                                            mode='date'))
-        ])
-        template_message = TemplateSendMessage(
-            alt_text='ImageCarousel alt text', template=image_carousel_template)
-        line_bot_api.reply_message(event.reply_token, template_message)
-    elif text == 'imagemap':
-        pass
-    elif text == 'Abbok':
-        bubble = BubbleContainer(
-            direction='ltr',
-            hero=ImageComponent(
-                url=request.url_root + '/images/shopFront.jpg',
-                size='full',
-                aspect_ratio='20:13',
-                aspect_mode='cover',
-                action=URIAction(uri='https://www.abbok.net', label='label')
-            ),
-            body=BoxComponent(
-                layout='vertical',
-                contents=[
-                    # title
-                    TextComponent(text='ABBOK Office', weight='bold', size='xl'),
-                    # review
-                    BoxComponent(
-                        layout='baseline',
-                        margin='md',
-                        contents=[
-                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            #IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            #IconComponent(size='sm', url='https://example.com/gold_star.png'),
-                            #IconComponent(size='sm', url='https://example.com/grey_star.png'),
-                            TextComponent(text='Design and Technology', size='sm', color='#999999', margin='md',
-                                          flex=0)
-                        ]
-                    ),
-                    # info
-                    BoxComponent(
-                        layout='vertical',
-                        margin='lg',
-                        spacing='sm',
-                        contents=[
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Place',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text='สวนหลวงสแควร์ ซอยจุฬาฯ 5 ถนนพระราม 1, กทมฯ',
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5
-                                    )
-                                ],
-                            ),
-                            BoxComponent(
-                                layout='baseline',
-                                spacing='sm',
-                                contents=[
-                                    TextComponent(
-                                        text='Time',
-                                        color='#aaaaaa',
-                                        size='sm',
-                                        flex=1
-                                    ),
-                                    TextComponent(
-                                        text="10:00 - 18:00",
-                                        wrap=True,
-                                        color='#666666',
-                                        size='sm',
-                                        flex=5,
-                                    ),
-                                ],
-                            ),
-                        ],
-                    )
-                ],
-            ),
-            footer=BoxComponent(
-                layout='vertical',
-                spacing='sm',
-                contents=[
-                    # callAction, separator, websiteAction
-                    SpacerComponent(size='sm'),
-                    # callAction
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='CALL', uri='tel:0912501735'),
-                    ),
-                    # separator
-                    SeparatorComponent(),
-                    # websiteAction
-                    ButtonComponent(
-                        style='link',
-                        height='sm',
-                        action=URIAction(label='WEBSITE', uri="https://www.abbok.net")
-                    )
-                ]
-            ),
-        )
-        message = FlexSendMessage(alt_text="Abbok's Infomation", contents=bubble)
-        line_bot_api.reply_message(
-            event.reply_token,
-            message
-        )
-    elif text == 'quick_reply':
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(
-                text='Quick reply',
-                quick_reply=QuickReply(
-                    items=[
-                        QuickReplyButton(
-                            action=PostbackAction(label="label1", data="data1")
-                        ),
-                        QuickReplyButton(
-                            action=MessageAction(label="label2", text="text2")
-                        ),
-                        QuickReplyButton(
-                            action=DatetimePickerAction(label="label3",
-                                                        data="data3",
-                                                        mode="date")
-                        ),
-                        QuickReplyButton(
-                            action=CameraAction(label="label4")
-                        ),
-                        QuickReplyButton(
-                            action=CameraRollAction(label="label5")
-                        ),
-                        QuickReplyButton(
-                            action=LocationAction(label="label6")
-                        ),
-                    ])))
-    else:
-        pass
-
-    ########## NEW #############
 
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location_message(event):
@@ -1020,7 +251,7 @@ def handle_postback(event):
     elif event.postback.data == 'yes':
         txt = 'ใจเย็นๆโฮ่ง!\nส่งข้อมูลไปแล้วจ้า!'
         if not mem.is_member(event.source.user_id):
-            add_member(event.source.user_id)
+            mem.add_member(event.source.user_id)
             txt = 'บันทึกสมาชิกเรียบร้อย!\nกรุณารอการยืนยัน!'
             line_bot_api.reply_message(
                 event.reply_token, [TextSendMessage(text=txt),
@@ -1034,14 +265,13 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
     elif event.postback.data == 'member_yes':
-        approve_member(1)
+        mem.approve_member(1)
         txt = 'ยืนยันสมาชิกเรียบร้อย!'
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
     elif event.postback.data == 'member_no':
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
-
 
 
 @handler.add(BeaconEvent)
@@ -1065,16 +295,6 @@ def handle_beacon(event):
 # @handler.add(MemberLeftEvent)
 # def handle_member_left(event):
 #     app.logger.info("Got memberLeft event")
-
-
-
-    ##################
-
-    if ce > 6 and ce < 9:
-        text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
     make_static_tmp_dir()

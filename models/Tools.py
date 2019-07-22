@@ -1,11 +1,13 @@
 from Member import Member
 from threading import Thread
 import csv, json, requests, math, os, time, random
+# sys, atexit
 from pythainlp.tokenize import word_tokenize
 from pythainlp.util import isthai
 from bs4 import BeautifulSoup as soup
 import numpy as np
-#from html.parser import HTMLParser
+import pandas as pd
+# from html.parser import HTMLParser
 from urllib.request import urlopen as uReq
 from urllib.request import urlretrieve as uRet
 
@@ -43,6 +45,13 @@ class Tools:
         quote = "{} - {}".format(quote[0], quote[1])
         print(quote)
         return quote
+
+    @staticmethod
+    def check_opt(input, opt):
+        if input == opt:
+            return True
+        else:
+            return False
 
 
 class Hoon:
