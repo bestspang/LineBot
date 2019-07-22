@@ -593,11 +593,12 @@ def handle_message(event):
         if rank in "01":
             if not is_working(event.source.user_id):
                 if 'check ' in text or 'checkin ' in text or text[:5] == 'check':
-                    textn = text.replace('checkin ', '').replace('check ', '')
+                    textn = text[-6:]
+                    #textn = text.replace('checkin ', '').replace('check ', '')
                     try:
                         int(textn)
                     except:
-                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ![1]"))
+                        line_bot_api.reply_message(event.reply_token,TextSendMessage(text="กรุณาพิมพ์ check หรือ checkin\nตามด้วยเว้นวรรคและเลข 6 หลักครับ![1]" + textn))
                         line_bot_api.reply_message(event.reply_token,TextSendMessage(text="ERROR: {}, {}".format(text, textn)))
                         return 0
 
