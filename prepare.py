@@ -4,7 +4,7 @@ from pythainlp.tokenize import word_tokenize
 #import itertools
 
 class Prepare(object):
-    #def __init__(self):
+    def __init__(self):
     #self.fileInput = fileInput
     def extractWord(self, alist):
         a = word_tokenize(alist, engine='newmm')

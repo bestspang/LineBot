@@ -608,7 +608,7 @@ def handle_message(event):
                     else:
                         response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
                 else:
-                    response_text = "กรุณาพิมพ์ check หรือ checkin ตามด้วยเว้นวรรคและเลข 6 หลักครับ![2]"
+                    response_text = "check error[2]" + text
             else:
                 response_text = "ไม่สามารถ check-in ได้เนื่องจากท่านยังไม่ได้ทำการ check-out!"
         else:
