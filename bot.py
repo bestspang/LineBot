@@ -472,6 +472,26 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
+    if 'ขอ' in words_list and 'เบอร์' in words_list:
+        client = get_client()
+        sheet = client.open('lineUser').worksheet('userDetail')
+        balance = sheet.cell(23, 2).value
+        price = "ยอดเงินในบัญชีตอนนี้มีทั้งหมด {} บาทครับผม!".format(balance)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
+    if text == 'มีเบอร์ใครบ้าง' or text == 'มีเบอใครบ้าง':
+        client = get_client()
+        sheet = client.open('lineUser').worksheet('userDetail')
+        name = sheet.col_values(2)
+        price = "มีเบอร์ {}".format(name)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
     if 'ขอ' in words_list and ('สรุปค่าใช้จ่าย' in text):
         client = get_client()
         urls = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRFS69FbmZBwkmCWtGWwDrA7YJyEpAmMyLHZ07FACjet8gxVX5WZ0DtVy2yW644QkY4d8UGctjfej0s/pubchart?oid=1508988021&format=image"
