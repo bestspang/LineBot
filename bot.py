@@ -4,7 +4,7 @@ from gevent.pywsgi import WSGIServer
 from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
-import requests, random, os, errno, configparser
+import os, errno, configparser
 import dialogflow, gspread, pprint, datetime, functools, time #tempfile
 from linebot import (LineBotApi, WebhookHandler)
 from linebot.exceptions import (LineBotApiError, InvalidSignatureError)
@@ -46,7 +46,6 @@ text = Text(line_bot_api)
 tools = Tools()
 hoon = Hoon()
 #vote = Vote()
-
 
 def make_static_tmp_dir():
     try:
