@@ -477,15 +477,14 @@ def handle_message(event):
         sheet = client.open('lineUser').worksheet('userDetail')
         namelist = sheet.col_values(2)
         name = text.replace("ขอเบอร์ ", "")
+        try:
+            name = name.upper()
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="ชื่อไม่ถูกต้อง"))
+            return 0
         if name in namelist[1:]:
-            try:
-                name = name.upper()
-            except:
-                line_bot_api.reply_message(
-                    event.reply_token,
-                    TextSendMessage(text="ชื่อไม่ถูกต้อง"))
-                return 0
-
             row = namelist.index(name)
             number = sheet.cell(row + 1, 11).value
             price = "เบอร์ของ {} คือ {}".format(name, number)
