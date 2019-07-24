@@ -496,7 +496,33 @@ def handle_message(event):
             TextSendMessage(text=price))
         return 0
 
-    if text == 'มีเบอร์ใครบ้าง' or text == 'มีเบอใครบ้าง':
+    if 'ขอ' in words_list and 'บัญชี' in words_list:
+        client = get_client()
+        sheet = client.open('lineUser').worksheet('userDetail')
+        namelist = sheet.col_values(2)
+        name = text.replace("ขอบัญชี ", "")
+        try:
+            name = name.upper()
+        except:
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text="ชื่อไม่ถูกต้อง"))
+            return 0
+        if name in namelist[1:]:
+            row = namelist.index(name)
+            number = sheet.cell(row + 1, 13).value
+            bank = sheet.cell(row + 1, 12).value
+            branches = sheet.cell(row + 1, 14).value
+            price = "บัญชีของ {} คือ {} ธนาคาร{} สาขา{}".format(name, number, bank, branches)
+        else:
+            price = "{} ไม่อยู่ในรายชื่อกรุณาถาม 'มีบัญชีใครบ้าง'".format(name)
+
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=price))
+        return 0
+
+    if text == 'มีเบอร์ใครบ้าง' or text == 'มีบัญชีใครบ้าง':
         client = get_client()
         sheet = client.open('lineUser').worksheet('userDetail')
         name = sheet.col_values(2)
