@@ -476,7 +476,7 @@ def handle_message(event):
         client = get_client()
         sheet = client.open('lineUser').worksheet('userDetail')
         namelist = sheet.col_values(2)
-        name = text.replace("ขอเบอร์ ", "")
+        name = text.replace("ขอเบอร์ ", "").strip()
         try:
             name = name.upper()
         except:
@@ -500,7 +500,7 @@ def handle_message(event):
         client = get_client()
         sheet = client.open('lineUser').worksheet('userDetail')
         namelist = sheet.col_values(2)
-        name = text.replace("ขอบัญชี ", "")
+        name = text.replace("ขอบัญชี ", "").strip()
         try:
             name = name.upper()
         except:
@@ -526,7 +526,7 @@ def handle_message(event):
         client = get_client()
         sheet = client.open('lineUser').worksheet('userDetail')
         name = sheet.col_values(2)
-        price = "มีเบอร์ {}".format(name[1:])
+        price = "มีเบอร์และบัญชีของ {}".format(name[1:])
         line_bot_api.reply_message(
             event.reply_token,
             TextSendMessage(text=price))
