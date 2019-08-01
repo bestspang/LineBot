@@ -46,7 +46,7 @@ class Text:
             pp = pprint.PrettyPrinter()
             balance = sheet.cell(23, 2).value
             #pp.pprint(balance)
-            price = "ยอดเงินในบัญชีตอนนี้มีทั้งหมด {} บาทครับผม!".format(balance)
+            price = f'ยอดเงินในบัญชีตอนนี้มีทั้งหมด {balance} บาทครับผม!'
             self.line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=price))
