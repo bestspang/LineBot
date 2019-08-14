@@ -128,7 +128,7 @@ def checkin_out(input_id, type):
         sheet = spread.worksheet('log')
         list_of_lists = sheet.get_all_values()
         df = pd.DataFrame(list_of_lists[1:], columns = list_of_lists[0])
-        df = df[pd.to_datetime(df['DATE']).dt.month == datetime.today().month]
+        df = df[pd.to_datetime(df['DATE']).dt.month == datetime.datetime.today().month]
         df['TIME'] = pd.to_datetime(df['TIME']).values.astype(np.int64)
         df['DATE'] = pd.to_datetime(df['DATE']).dt.date
         df['USER_ID'] = df['USER_ID'].astype(int)
