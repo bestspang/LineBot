@@ -141,7 +141,7 @@ def checkin_out(input_id, type):
         w_total = w_out.copy()
         w_total['TIME'] = w_out['TIME'] - w_in['TIME']
         w_total['TIME'] = pd.to_datetime(w_total['TIME']).dt.time
-        avg_worktime = w_total[w_total['USER_ID'] == user_id.index(input_id) + 1]['TIME'].valu es[0].strftime("%H:%M:%S")
+        avg_worktime = w_total[w_total['USER_ID'] == user_id.index(input_id) + 1]['TIME'].values[0].strftime("%H:%M:%S")
         avg_text = 'ในเดือนนี้คุณได้ทำงานเฉลี่ยเป็นเวลา {} ช.ม. ต่อวัน'.format(avg_worktime)
         #######
         sheet.update_cell(user_id.index(input_id) + 2, 5, '')
