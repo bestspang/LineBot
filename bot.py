@@ -28,6 +28,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!!!'
 app.config['DEBUG'] = False
 abbok_id = "C374667ff440b48857dafb57606ff4600"
+to_mem = get_user_key()
 
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
@@ -776,7 +777,7 @@ def handle_message(event):
         if rank in "0":
             if '!ct ' in text:
                 textn = text.replace('!ct ', '')
-                to_mem = get_user_key()
+                # to_mem = get_user_key()
                 for i in to_mem:
                     line_bot_api.push_message(i, TextSendMessage(text=textn))
             else:
