@@ -27,6 +27,7 @@ __author__ = 'bestspang'
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!!!'
 app.config['DEBUG'] = False
+abbok_id = "C374667ff440b48857dafb57606ff4600"
 
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
@@ -97,6 +98,18 @@ def who_work():
         text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
     return text
 
+def get_user_key(approve=True):
+    client = get_client()
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    user_id = sheet.col_values(2)[1:]
+    is_approve = sheet.col_values(6)[1:]
+    if approve is False:
+        return user_id
+    else:
+        is_approve = [1 if i == 'APPROVE' else 0 for i in is_approve]
+        approve_mem = [id for id, i in zip(user_id, is_approve) if i == 1]
+        return approve_mem
+
 def checkin_out(input_id, type):
     client = get_client()
     profile = line_bot_api.get_profile(input_id)
@@ -113,7 +126,7 @@ def checkin_out(input_id, type):
     row = [row_num + 1,now.strftime('%Y/%m/%d'),now.strftime("%I:%M %p"), user_id.index(input_id) + 1,type]
     index = row_num + 2
     sheet2.insert_row(row, index)
-    to = "C374667ff440b48857dafb57606ff4600"
+    to = abbok_id
     to_user = input_id
     if type == "1":
         text = "Check-In!"
@@ -178,7 +191,7 @@ def add_member(input):
     row = [row_num + 1,profile.display_name, input, "WAITING", now.strftime('%Y/%m/%d'),"4",profile.picture_url]
     index = row_num + 2
     sheet.insert_row(row, index)
-    to = "C374667ff440b48857dafb57606ff4600"
+    to = abbok_id
     line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
 def is_approve_new_member():
@@ -240,10 +253,11 @@ def print_date_time():
     # global date_time
     # date_time += datetime.timedelta(days=1)
     #to = "U7612d77bbca83f04d6acf5e27333edeb" #best
-    to = "C374667ff440b48857dafb57606ff4600" #group
-    to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a", # BEST, TAAN
-            "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09", # SNOOK, TEAM
-            "U5ac4ec185e02185b6eae0d54d56f7d10", "Ube7c6d3358f6994218ffb623d4d8a06e"] # NUT, TEOY
+    to = abbok_id #group
+    # to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a", # BEST, TAAN
+    #         "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09", # SNOOK, TEAM
+    #         "U5ac4ec185e02185b6eae0d54d56f7d10", "Ube7c6d3358f6994218ffb623d4d8a06e"] # NUT, TEOY
+    to_mem = get_user_key()
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
@@ -743,15 +757,30 @@ def handle_message(event):
             TextSendMessage(text=text))
         return 0
 
-    if 'cast' in words_list or 'castto' in words_list:
+    if '!c' in words_list:
         rank = member_rank(event.source.user_id)
         if rank in "0":
-            if 'cast ' in text or 'castto ' in text:
-                textn = text.replace('cast ', '').replace('castto ', '')
-                to = "C374667ff440b48857dafb57606ff4600"
+            if '!c ' in text:
+                textn = text.replace('!c ', '')
+                to = abbok_id
                 line_bot_api.push_message(to, TextSendMessage(text=textn))
             else:
-                response_text = "กรุณาพิมพ์ cast หรือ castto\nตามด้วยประโยคที่ต้องการเผยแพร่!"
+                response_text = "กรุณาพิมพ์ !c\nตามด้วยประโยคที่ต้องการเผยแพร่!"
+        else:
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
+
+        return 0
+
+    if '!ct' in words_list:
+        rank = member_rank(event.source.user_id)
+        if rank in "0":
+            if '!ct ' in text:
+                textn = text.replace('!ct ', '')
+                to_mem = get_user_key()
+                for i in to_mem:
+                    line_bot_api.push_message(i, TextSendMessage(text=textn))
+            else:
+                response_text = "กรุณาพิมพ์ !ct\nตามด้วยประโยคที่ต้องการเผยแพร่!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
 
@@ -1325,8 +1354,6 @@ def handle_beacon(event):
 # @handler.add(MemberLeftEvent)
 # def handle_member_left(event):
 #     app.logger.info("Got memberLeft event")
-
-
 
     ##################
 
