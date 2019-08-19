@@ -28,7 +28,6 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!!!'
 app.config['DEBUG'] = False
 abbok_id = "C374667ff440b48857dafb57606ff4600"
-to_mem = get_user_key()
 
 #turn the flask app into a socketio app
 socketio = SocketIO(app)
@@ -454,6 +453,8 @@ def makeDF(soupdata, ind=0):
     total_col = int(len(row_list)/num_col)
     row_list = np.reshape(row_list, (total_col, num_col) )
     return pd.DataFrame(columns = head_list, data = row_list)
+
+to_mem = get_user_key()
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
