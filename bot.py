@@ -5,7 +5,7 @@ from flask_socketio import SocketIO, emit
 from flask import Flask, request, abort, send_from_directory, jsonify,render_template, url_for, copy_current_request_context, Response
 from oauth2client.service_account import ServiceAccountCredentials
 import requests, random, os, errno, sys, configparser, csv, atexit
-import dialogflow, gspread, pprint, datetime, functools, time #tempfile
+import gspread, pprint, datetime, functools, time #tempfile #dialogflow
 import numpy as np
 import pandas as pd
 from pythainlp.tokenize import word_tokenize
@@ -667,21 +667,21 @@ def handle_message(event):
             TextSendMessage(text=quote))
         return 0
 #fix google dialogflow
-    if 'ทดลอง' in words_list:
-        if 'ทดลอง ' in text:
-            price = 'นี้คือระบบ test : '
-            textn = text.replace('ทดลอง ', '').replace('test ', '')
-            project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
-            try:
-                fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-            except:
-                fulfillment_text = "ระบบผิดพลาด"
-                pass
-            response_text = fulfillment_text
-            line_bot_api.reply_message(
-                event.reply_token,
-                TextSendMessage(text=response_text))
-        return 0
+    # if 'ทดลอง' in words_list:
+    #     if 'ทดลอง ' in text:
+    #         price = 'นี้คือระบบ test : '
+    #         textn = text.replace('ทดลอง ', '').replace('test ', '')
+    #         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+    #         try:
+    #             fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
+    #         except:
+    #             fulfillment_text = "ระบบผิดพลาด"
+    #             pass
+    #         response_text = fulfillment_text
+    #         line_bot_api.reply_message(
+    #             event.reply_token,
+    #             TextSendMessage(text=response_text))
+    #     return 0
 
 # test decorator
 
@@ -776,7 +776,7 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         if rank in "0":
             if '!ct ' in text:
-                textn = text.replace('!ct ', '')
+                textn = text.resplace('!ct ', '')
                 # to_mem = get_user_key()
                 for i in to_mem:
                     line_bot_api.push_message(i, TextSendMessage(text=textn))
