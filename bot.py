@@ -454,7 +454,6 @@ def makeDF(soupdata, ind=0):
     row_list = np.reshape(row_list, (total_col, num_col) )
     return pd.DataFrame(columns = head_list, data = row_list)
 
-to_mem = get_user_key()
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -766,11 +765,14 @@ def handle_message(event):
                 textn = text.replace('!c ', '')
                 to = abbok_id
                 line_bot_api.push_message(to, TextSendMessage(text=textn))
+                return 0
             else:
                 response_text = "กรุณาพิมพ์ !c\nตามด้วยประโยคที่ต้องการเผยแพร่!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
-
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
         return 0
 
     if text.startswith('!ct'):
@@ -778,14 +780,17 @@ def handle_message(event):
         if rank in "0":
             if '!ct ' in text:
                 textn = text.resplace('!ct ', '')
-                # to_mem = get_user_key()
+                to_mem = get_user_key()
                 for i in to_mem:
                     line_bot_api.push_message(i, TextSendMessage(text=textn))
+                return 0
             else:
                 response_text = "กรุณาพิมพ์ !ct\nตามด้วยประโยคที่ต้องการเผยแพร่!"
         else:
             response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: " + rank
-
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
         return 0
 
     ce = random.randint(1,10)
