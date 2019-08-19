@@ -779,7 +779,7 @@ def handle_message(event):
         rank = member_rank(event.source.user_id)
         if rank in "0":
             if '!ct ' in text:
-                textn = text.resplace('!ct ', '')
+                textn = text.replace('!ct ', '')
                 to_mem = get_user_key()
                 for i in to_mem:
                     line_bot_api.push_message(i, TextSendMessage(text=textn))
