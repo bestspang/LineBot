@@ -757,7 +757,7 @@ def handle_message(event):
             TextSendMessage(text=text))
         return 0
 
-    if '!c' in words_list:
+    if text.startswith('!c')
         rank = member_rank(event.source.user_id)
         if rank in "0":
             if '!c ' in text:
@@ -771,7 +771,7 @@ def handle_message(event):
 
         return 0
 
-    if '!ct' in words_list:
+    if text.startswith('!ct'):
         rank = member_rank(event.source.user_id)
         if rank in "0":
             if '!ct ' in text:
