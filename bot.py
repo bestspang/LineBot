@@ -209,6 +209,9 @@ def is_approve_new_member():
     TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
     template_message])
 
+def work_outside():
+    pass
+
 def approve_member(boo):
     client = get_client()
     if boo == 1:
@@ -1348,7 +1351,6 @@ def handle_beacon(event):
             text='Got beacon event. hwid={}, device_message(hex string)={}'.format(
                 event.beacon.hwid, event.beacon.dm)))
 
-
 # @handler.add(MemberJoinedEvent)
 # def handle_member_joined(event):
 #     line_bot_api.reply_message(
@@ -1361,8 +1363,6 @@ def handle_beacon(event):
 # @handler.add(MemberLeftEvent)
 # def handle_member_left(event):
 #     app.logger.info("Got memberLeft event")
-
-    ##################
 
     if ce > 6 and ce < 9:
         text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
