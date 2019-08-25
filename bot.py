@@ -94,17 +94,27 @@ def who_work():
         text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
     return text
 
-def get_user_key(approve=True):
+def get_user_key(approve=True, check_is_in=False, is=None):
     client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     is_approve = sheet.col_values(6)[1:]
+    is_in = sheet.col_values(4)[1:]
+    is_in = [int(i) for i in is_in]
+    is_approve = [1 if i == 'APPROVE' else 0 for i in is_approve]
+    approve_mem = [id for id, i in zip(user_id, is_approve) if i == 1]
+
     if approve is False:
         return user_id
     else:
-        is_approve = [1 if i == 'APPROVE' else 0 for i in is_approve]
-        approve_mem = [id for id, i in zip(user_id, is_approve) if i == 1]
-        return approve_mem
+        if check_is_in:
+            if is == 'out':
+                out_mem = [id for id, i in zip(user_id, is_in) if i == 0]
+                return out_mem
+            if is == 'in':
+                in_mem = [id for id, i in zip(user_id, is_in) if i == 1]
+                return in_mem
+            return approve_mem
 
 def checkin_out(input_id, type):
     client = get_client()
@@ -205,9 +215,6 @@ def is_approve_new_member():
     TextSendMessage(text="สมาชิกใหม่ได้ทำการกรอกเอกสาร!\nจะ APPROVE หรือไม่?"),
     template_message])
 
-def work_outside():
-    pass
-
 def approve_member(boo):
     client = get_client()
     if boo == 1:
@@ -261,6 +268,17 @@ def print_date_time():
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
+def auto_alertin():
+    to_mem = get_user_key(approve=True, check_is_in=True, is='out')
+    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
+    for i in to_mem:
+        line_bot_api.push_message(i, TextSendMessage(text="อย่าลืม log-in นะโฮ่ง!"))
+
+def auto_alertout():
+    to_mem = get_user_key(approve=True, check_is_in=True, is='in')
+    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
+    for i in to_mem:
+        line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
 
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
@@ -268,6 +286,15 @@ def init_scheduler():
     job = scheduler.add_job(print_date_time,"cron",
                 day_of_week='mon-fri',
                 hour=9, minute=40)# args=[text]
+
+    job2 = scheduler.add_job(auto_alertin,"cron",
+                day_of_week='mon-fri',
+                hour=11, minute=00)# args=[text]
+
+    job3 = scheduler.add_job(auto_alertout,"cron",
+                day_of_week='mon-fri',
+                hour=18, minute=30)# args=[text]
+
     scheduler.start()
     # Shut down the scheduler when exiting the app
     # atexit.register(lambda: scheduler.shutdown())
