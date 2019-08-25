@@ -46,10 +46,6 @@ static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
 
-# scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-# creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-# client = gspread.authorize(creds)
-
 mem = Member()
 tools = Tools()
 #vote = Vote()
