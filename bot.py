@@ -956,7 +956,7 @@ def handle_message(event):
                 TextSendMessage(text='success: ' + str(result.success)),
             ]
         )
-    elif text == 'bye':
+    elif text == '!bye':
         if isinstance(event.source, SourceGroup):
             line_bot_api.reply_message(
                 event.reply_token, TextSendMessage(text='Leaving group'))
@@ -1064,7 +1064,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, template_message)
     elif text == 'imagemap':
         pass
-    elif text == 'Abbok':
+    elif text == 'flex':
         bubble = BubbleContainer(
             direction='ltr',
             hero=ImageComponent(
