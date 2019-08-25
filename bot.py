@@ -94,7 +94,7 @@ def who_work():
         text = 'ไม่มีคนอยู่ที่ทำงานเลยครับ!'
     return text
 
-def get_user_key(approve=True, check_is_in=False, is=None):
+def get_user_key(approve=True, check_is_in=False, isw='out'):
     client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
@@ -108,10 +108,10 @@ def get_user_key(approve=True, check_is_in=False, is=None):
         return user_id
     else:
         if check_is_in:
-            if is == 'out':
+            if isw == 'out':
                 out_mem = [id for id, i in zip(user_id, is_in) if i == 0]
                 return out_mem
-            if is == 'in':
+            if isw == 'in':
                 in_mem = [id for id, i in zip(user_id, is_in) if i == 1]
                 return in_mem
             return approve_mem
@@ -269,13 +269,13 @@ def print_date_time():
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
 def auto_alertin():
-    to_mem = get_user_key(approve=True, check_is_in=True, is='out')
+    to_mem = get_user_key(approve=True, check_is_in=True, isw='out')
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="อย่าลืม log-in นะโฮ่ง!"))
 
 def auto_alertout():
-    to_mem = get_user_key(approve=True, check_is_in=True, is='in')
+    to_mem = get_user_key(approve=True, check_is_in=True, isw='in')
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
