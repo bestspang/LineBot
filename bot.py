@@ -50,6 +50,10 @@ mem = Member()
 tools = Tools()
 #vote = Vote()
 
+to_mem_out = None
+to_mem_in = None
+to_mem = None
+
 def get_client():
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
@@ -263,28 +267,28 @@ def print_date_time():
     # to_mem = ["U7612d77bbca83f04d6acf5e27333edeb", "U262184d96cc22dfb837493e3ff6ca85a", # BEST, TAAN
     #         "U03fe1d43c072db5c3dde2f2a20fddcb9", "Ub4cd6bb2dc9548dd416a35e5b7488c09", # SNOOK, TEAM
     #         "U5ac4ec185e02185b6eae0d54d56f7d10", "Ube7c6d3358f6994218ffb623d4d8a06e"] # NUT, TEOY
-    to_mem = get_user_key()
+    # to_mem = get_user_key()
     line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="ทำงานอย่าลืม check-in นะครับผม!"))
 
 def auto_alertin():
-    to_mem = get_user_key(approve=True, check_is_in=True, isw='out')
-    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
-    for i in to_mem:
+    for i in to_mem_out:
         line_bot_api.push_message(i, TextSendMessage(text="อย่าลืม log-in นะโฮ่ง!"))
 
 def auto_alertout():
-    to_mem = get_user_key(approve=True, check_is_in=True, isw='in')
-    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
-    for i in to_mem:
+    for i in to_mem_in:
         line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
 
 def test_alert():
-    to_mem = get_user_key(approve=True, check_is_in=True, isw='in')
-    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
-    for i in to_mem:
+    for i in to_mem_in:
         line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
+
+def alert_update():
+    to_mem_out = get_user_key(approve=True, check_is_in=True, isw='out')
+    to_mem_in = get_user_key(approve=True, check_is_in=True, isw='in')
+    to_mem = get_user_key()
+
 
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
@@ -303,7 +307,10 @@ def init_scheduler():
 
     job4 = scheduler.add_job(test_alert,"cron",
                 day_of_week='mon-fri',
-                hour=13, minute=5)# args=[text]
+                hour=14, minute=42)# args=[text]
+
+    job5 = scheduler.add_job(alert_update,'interval', minutes=10,
+                day_of_week='mon-fri')# args=[text]
 
     scheduler.start()
     # Shut down the scheduler when exiting the app
