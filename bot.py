@@ -313,7 +313,7 @@ def init_scheduler():
 
     job4 = scheduler.add_job(test_alert,"cron",
                 day_of_week='mon-fri',
-                hour=15, minute=50)# args=[text]
+                hour=15, minute=55)# args=[text]
 
     job5 = scheduler.add_job(alert_update,'interval', minutes=5)# args=[text]
 
