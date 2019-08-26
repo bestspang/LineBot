@@ -309,8 +309,7 @@ def init_scheduler():
                 day_of_week='mon-fri',
                 hour=14, minute=42)# args=[text]
 
-    job5 = scheduler.add_job(alert_update,'interval', minutes=10,
-                day_of_week='mon-fri')# args=[text]
+    job5 = scheduler.add_job(alert_update,'interval', minutes=10)# args=[text]
 
     scheduler.start()
     # Shut down the scheduler when exiting the app
