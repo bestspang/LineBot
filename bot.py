@@ -280,6 +280,12 @@ def auto_alertout():
     for i in to_mem:
         line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
 
+def test_alert():
+    to_mem = get_user_key(approve=True, check_is_in=True, isw='in')
+    line_bot_api.push_message(to, TextSendMessage(text=tools.getQuote()))
+    for i in to_mem:
+        line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
+
 def init_scheduler():
     scheduler = BackgroundScheduler({'apscheduler.timezone': 'Asia/Bangkok'})
     #scheduler.add_job(func=print_date_time, trigger="interval", seconds=3)
@@ -294,6 +300,10 @@ def init_scheduler():
     job3 = scheduler.add_job(auto_alertout,"cron",
                 day_of_week='mon-fri',
                 hour=18, minute=30)# args=[text]
+
+    job4 = scheduler.add_job(test_alert,"cron",
+                day_of_week='mon-fri',
+                hour=13, minute=5)# args=[text]
 
     scheduler.start()
     # Shut down the scheduler when exiting the app
