@@ -285,9 +285,13 @@ def test_alert():
         line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
 
 def alert_update():
+    print("update: mem lists")
     to_mem_out = get_user_key(approve=True, check_is_in=True, isw='out')
     to_mem_in = get_user_key(approve=True, check_is_in=True, isw='in')
     to_mem = get_user_key()
+    print(to_mem_out)
+    print(to_mem_in)
+    print(to_mem)
 
 
 def init_scheduler():
@@ -307,7 +311,7 @@ def init_scheduler():
 
     job4 = scheduler.add_job(test_alert,"cron",
                 day_of_week='mon-fri',
-                hour=15, minute=10)# args=[text]
+                hour=15, minute=29)# args=[text]
 
     job5 = scheduler.add_job(alert_update,'interval', minutes=10)# args=[text]
 
