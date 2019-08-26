@@ -280,11 +280,9 @@ def auto_alertout():
     for i in to_mem_in:
         line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
 
-def test_alert():
-    print("auto_alert!")
-    print("to_mem_in", to_mem_in)
+def auto_alertout2():
     for i in to_mem_in:
-        line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
+        line_bot_api.push_message(i, TextSendMessage(text="เผื่อลืม ดึกแล้วอย่าลืม check-out นะโฮ่ง!"))
 
 def alert_update():
     global to_mem_out
@@ -314,9 +312,9 @@ def init_scheduler():
                 day_of_week='mon-fri',
                 hour=18, minute=30)# args=[text]
 
-    job4 = scheduler.add_job(test_alert,"cron",
+    job4 = scheduler.add_job(auto_alertout2,"cron",
                 day_of_week='mon-fri',
-                hour=16, minute=5)# args=[text]
+                hour=19, minute=30)# args=[text]
 
     job5 = scheduler.add_job(alert_update,'interval', minutes=1)# args=[text]
 
