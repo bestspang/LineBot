@@ -114,7 +114,7 @@ def get_user_key(approve=True, check_is_in=False, isw='out'):
             if isw == 'in':
                 in_mem = [id for id, i in zip(user_id, is_in) if i == 1]
                 return in_mem
-            return approve_mem
+        return approve_mem
 
 def checkin_out(input_id, type):
     client = get_client()
