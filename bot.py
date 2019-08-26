@@ -282,6 +282,7 @@ def auto_alertout():
 
 def test_alert():
     print("auto_alert!")
+    print("to_mem_in", to_mem_in)
     for i in to_mem_in:
         line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
 
@@ -312,7 +313,7 @@ def init_scheduler():
 
     job4 = scheduler.add_job(test_alert,"cron",
                 day_of_week='mon-fri',
-                hour=15, minute=41)# args=[text]
+                hour=15, minute=50)# args=[text]
 
     job5 = scheduler.add_job(alert_update,'interval', minutes=5)# args=[text]
 
