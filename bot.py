@@ -281,6 +281,7 @@ def auto_alertout():
         line_bot_api.push_message(i, TextSendMessage(text="เย็นแล้วอย่าลืม check-out นะโฮ่ง!"))
 
 def test_alert():
+    print("auto_alert!")
     for i in to_mem_in:
         line_bot_api.push_message(i, TextSendMessage(text="Test ระบบ!"))
 
@@ -311,9 +312,9 @@ def init_scheduler():
 
     job4 = scheduler.add_job(test_alert,"cron",
                 day_of_week='mon-fri',
-                hour=15, minute=29)# args=[text]
+                hour=15, minute=41)# args=[text]
 
-    job5 = scheduler.add_job(alert_update,'interval', minutes=10)# args=[text]
+    job5 = scheduler.add_job(alert_update,'interval', minutes=5)# args=[text]
 
     scheduler.start()
     # Shut down the scheduler when exiting the app
