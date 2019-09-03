@@ -734,7 +734,7 @@ def handle_message(event):
 
 # test decorator
 
-    if 'check' in words_list or '!check' in words_list:
+    if text.startswith('check') or text.startswith('checkin'):
         rank = member_rank(event.source.user_id)
         response_text = "รหัส(code)ไม่ถูกต้องครับ!"
         if rank in "01":
@@ -844,7 +844,7 @@ def handle_message(event):
 
     if text.startswith('ขอcheck'):
         rank = member_rank(event.source.user_id)
-        if rank in "1":
+        if rank in "01":
             if not is_working(event.source.user_id):
 
                 id_working, name_working = get_who_working_id()
