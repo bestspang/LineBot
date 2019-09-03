@@ -1296,7 +1296,7 @@ def handle_message(event):
                     ])))
     else:
         # fix google dialogflow
-        if 'ทดลอง' in words_list:
+        if text.startswith('ทดลอง'):
             if 'ทดลอง ' in text:
                 price = 'นี้คือระบบ test : '
                 textn = text.replace('ทดลอง ', '').replace('test ', '')
