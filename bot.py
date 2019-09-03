@@ -1469,6 +1469,14 @@ def handle_postback(event):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
     elif event.postback.data == 'check_no':
+
+        client = get_client()
+        sheet = client.open('userCheckin').worksheet('userStatus')
+        is_req = sheet.col_values(7)[1:]
+        user_id = sheet.col_values(2)[1:][is_req.index('1')]
+
+        sheet.update_cell(user_id.index(user_id) + 2, 7, '0')
+
         txt = 'รับทราบ! ไม่ทำการApprove!'
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
