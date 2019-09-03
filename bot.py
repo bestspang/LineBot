@@ -130,7 +130,7 @@ def get_user_key(approve=True, check_is_in=False, isw='out'):
                 return in_mem
         return approve_mem
 
-def checkin_out(input_id, type):
+def checkin_out(input_id, type, request=False, who=None):
     client = get_client()
     profile = line_bot_api.get_profile(input_id)
     now = datetime.datetime.now() + datetime.timedelta(seconds = 25200)
@@ -151,6 +151,10 @@ def checkin_out(input_id, type):
     if type == "1":
         text = "Check-In!"
         sheet.update_cell(user_id.index(input_id) + 2, 5, now.strftime("%I:%M %p"))
+        if request:
+            sheet.update_cell(user_id.index(input_id) + 2, 7, 0)
+            sheet.update_cell(user_id.index(input_id) + 2, 8, who)
+            text = f"Check-In! APPROVE โดย {who}"
     elif type == "0":
         text = "Check-out!"
         total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
@@ -177,6 +181,7 @@ def checkin_out(input_id, type):
         avg_worktime = w_total[w_total['USER_ID'] == user_id.index(input_id) + 1]['TIME'].values[0].strftime("%H:%M:%S")
         avg_text = 'ในเดือนนี้คุณได้ทำงานเฉลี่ยเป็นเวลา {} ช.ม. ต่อวัน'.format(avg_worktime)
         #######
+        sheet.update_cell(user_id.index(input_id) + 2, 8, '')
         sheet.update_cell(user_id.index(input_id) + 2, 5, '')
         line_bot_api.push_message(to_user, TextSendMessage(text=total_work))
         line_bot_api.push_message(to_user, TextSendMessage(text=avg_text))
@@ -839,11 +844,30 @@ def handle_message(event):
 
     if text.startswith('ขอcheck'):
         rank = member_rank(event.source.user_id)
-        #get_who_working_id()
         if rank in "1":
             if not is_working(event.source.user_id):
 
-                if text.startswith('ขอcheck ') or text.startswith('ขอcheckin ') or text[:8] == 'ขอcheck ':
+                if text.startswith('ขอcheck') or text.startswith('ขอcheckin') or text[:8] == 'ขอcheck':
+
+                    id_working, name_working = get_who_working_id()
+                    if len(id_working) == 0:
+                        line_bot_api.reply_message(
+                            event.reply_token, TextSendMessage(text="ไม่มีใครอยู่ออฟฟิศ โฮ่ง!"))
+                        return 0
+
+                    input_id = event.source.user_id
+                    client = get_client()
+                    profile = line_bot_api.get_profile(input_id)
+                    sheet = client.open('userCheckin').worksheet('userStatus')
+                    user_id = sheet.col_values(2)[1:]
+                    requested = sheet.col_values(7)[1:]
+
+                    if '1' in requested or 1 in requested:
+                        line_bot_api.reply_message(
+                            event.reply_token, TextSendMessage(text="มีคนอื่นขอ check-in โปรดรอสักครู่ โฮ่ง!"))
+                        return 0
+
+                    sheet.update_cell(user_id.index(input_id) + 2, 7, "1")
 
                     confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
                         PostbackAction(label='Yes',text='Yes!',data='check_yes'),
@@ -852,18 +876,13 @@ def handle_message(event):
                     template_message = TemplateSendMessage(
                         alt_text='Approve check_in', template=confirm_template)
 
-                    id_working, name_working = get_who_working_id()
-                    for i in all_working:
-                        line_bot_api.push_message(i, [TextSendMessage(text="คุณ "+name),
-                        TextSendMessage(text="คุณได้ขอทำการ check-in!\nจะ APPROVE หรือไม่?"),
+                    for i in id_working:
+                        line_bot_api.push_message(i, [TextSendMessage(text=f"คุณ{profile.display_name}"),
+                        TextSendMessage(text=f"ได้ขอทำการ check-in!\nจะ APPROVE หรือไม่?"),
                         template_message])
 
-                    number = os.getenv('OTP_BACKUP')
-                    if check_opt(textn, number) and textn is not None and len(textn) == 6:
-                        checkin_out(event.source.user_id,"1")
-                        response_text = "Check in สำเร็จแล้วครับ!"
-                    else:
-                        response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
+                    response_text = "โปรดรอคน APPROVE โฮ่ง!"
+
                 else:
                     response_text = "check error[2]" + text
 
@@ -1443,7 +1462,14 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
     elif event.postback.data == 'check_yes':
-        approve_member(1)
+        profile = line_bot_api.get_profile(event.source.user_id)
+
+        client = get_client()
+        sheet = client.open('userCheckin').worksheet('userStatus')
+        is_req = sheet.col_values(7)[1:]
+        user_id = sheet.col_values(2)[1:][is_req.index('1')]
+
+        checkin_out(user_id, "1", True, profile.display_name)
         txt = 'Approve เรียบร้อย!'
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
