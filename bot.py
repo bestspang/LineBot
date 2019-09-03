@@ -81,6 +81,16 @@ def is_working(input_id):
     user_id = sheet.col_values(2)[1:]
     return int(sheet.col_values(4)[1:][user_id.index(input_id)])
 
+def get_who_working_id():
+    client = get_client()
+    sheet = client.open('userCheckin').worksheet('userStatus')
+    user_id = sheet.col_values(2)[1:]
+    user_name = sheet.col_values(3)[1:]
+    is_in = sheet.col_values(4)[1:]
+    is_in = [u for i, u in zip(is_in, user_id) if int(i) == 1]
+    user_in = [u for i, u in zip(is_in, user_name) if int(i) == 1]
+    return is_in, user_in
+
 def who_work():
     client = get_client()
     sheet = client.open('userCheckin').worksheet('userStatus')
@@ -204,6 +214,7 @@ def add_member(input):
     to = abbok_id
     line_bot_api.push_message(to, TextSendMessage(text=profile.display_name + 'ได้สมัครสมาชิก!'))
 
+# not working need to check spread sheet
 def is_approve_new_member():
     client = get_client()
     sheet = client.open('lineUser').worksheet('user')
@@ -715,22 +726,6 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=quote))
         return 0
-#fix google dialogflow
-    # if 'ทดลอง' in words_list:
-    #     if 'ทดลอง ' in text:
-    #         price = 'นี้คือระบบ test : '
-    #         textn = text.replace('ทดลอง ', '').replace('test ', '')
-    #         project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
-    #         try:
-    #             fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-    #         except:
-    #             fulfillment_text = "ระบบผิดพลาด"
-    #             pass
-    #         response_text = fulfillment_text
-    #         line_bot_api.reply_message(
-    #             event.reply_token,
-    #             TextSendMessage(text=response_text))
-    #     return 0
 
 # test decorator
 
@@ -809,7 +804,7 @@ def handle_message(event):
 
     if text.startswith('!c '):
         rank = member_rank(event.source.user_id)
-        if rank in "0":
+        if rank in "01":
             if '!c ' in text:
                 textn = text.replace('!c ', '')
                 to = abbok_id
@@ -842,7 +837,45 @@ def handle_message(event):
             TextSendMessage(text=response_text))
         return 0
 
-    ce = random.randint(1,10)
+    if text.startswith('ขอcheck'):
+        rank = member_rank(event.source.user_id)
+        #get_who_working_id()
+        if rank in "1":
+            if not is_working(event.source.user_id):
+
+                if text.startswith('ขอcheck ') or text.startswith('ขอcheckin ') or text[:8] == 'ขอcheck ':
+
+                    confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
+                        PostbackAction(label='Yes',text='Yes!',data='check_yes'),
+                        PostbackAction(label='No',text='No!',data='check_no'),
+                    ])
+                    template_message = TemplateSendMessage(
+                        alt_text='Approve check_in', template=confirm_template)
+
+                    id_working, name_working = get_who_working_id()
+                    for i in all_working:
+                        line_bot_api.push_message(i, [TextSendMessage(text="คุณ "+name),
+                        TextSendMessage(text="คุณได้ขอทำการ check-in!\nจะ APPROVE หรือไม่?"),
+                        template_message])
+
+                    number = os.getenv('OTP_BACKUP')
+                    if check_opt(textn, number) and textn is not None and len(textn) == 6:
+                        checkin_out(event.source.user_id,"1")
+                        response_text = "Check in สำเร็จแล้วครับ!"
+                    else:
+                        response_text = "รหัสที่คุณป้อน "+ textn + " ไม่ถูกต้อง!"
+                else:
+                    response_text = "check error[2]" + text
+
+            else:
+                response_text = "คุณได้ check-in ไปแล้ว! หรือลืม check-out!"
+        else:
+            response_text = "เฉพาะพนักงานที่มีสิิทธิ์ใช้คำสั่งดังกล่าว! rank: 0,1 you: " + rank
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=response_text))
+        return 0
+
     if 'แบม' in words_list or 'บี้' in words_list:
         texts = ['ตูดหมึก', 'ปากห้อย', 'อ้วน', 'ขี้โม้', 'ไม่เชื่อ!', 'เด็กอ้วน', 'แก้มดุ่ย', 'บี้']
         line_bot_api.reply_message(
@@ -1248,7 +1281,29 @@ def handle_message(event):
                         ),
                     ])))
     else:
-        pass
+        # fix google dialogflow
+        if 'ทดลอง' in words_list:
+            if 'ทดลอง ' in text:
+                price = 'นี้คือระบบ test : '
+                textn = text.replace('ทดลอง ', '').replace('test ', '')
+                project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+                try:
+                    fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
+                except:
+                    fulfillment_text = "ระบบผิดพลาด"
+                    pass
+                response_text = fulfillment_text
+                line_bot_api.reply_message(
+                    event.reply_token,
+                    TextSendMessage(text=response_text))
+            return 0
+
+        ce = random.randint(1,10)
+        if ce > 6 and ce < 9:
+            text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
+            line_bot_api.reply_message(
+                event.reply_token,
+                TextSendMessage(text=text[random.randint(0,8)]))
 
     ########## NEW #############
 
@@ -1387,6 +1442,16 @@ def handle_postback(event):
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
+    elif event.postback.data == 'check_yes':
+        approve_member(1)
+        txt = 'Approve เรียบร้อย!'
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=txt))
+    elif event.postback.data == 'check_no':
+        txt = 'รับทราบ! ไม่ทำการApprove!'
+        line_bot_api.reply_message(
+            event.reply_token, TextSendMessage(text=txt))
+
 
 
 @handler.add(BeaconEvent)
@@ -1410,11 +1475,6 @@ def handle_beacon(event):
 # def handle_member_left(event):
 #     app.logger.info("Got memberLeft event")
 
-    if ce > 6 and ce < 9:
-        text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=text[random.randint(0,8)]))
 
 if __name__ == "__main__":
     make_static_tmp_dir()
