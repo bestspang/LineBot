@@ -847,44 +847,39 @@ def handle_message(event):
         if rank in "1":
             if not is_working(event.source.user_id):
 
-                if text.startswith('ขอcheck') or text.startswith('ขอcheckin') or text[:8] == 'ขอcheck':
+                id_working, name_working = get_who_working_id()
+                if len(id_working) == 0:
+                    line_bot_api.reply_message(
+                        event.reply_token, TextSendMessage(text="ไม่มีใครอยู่ออฟฟิศ โฮ่ง!"))
+                    return 0
 
-                    id_working, name_working = get_who_working_id()
-                    if len(id_working) == 0:
-                        line_bot_api.reply_message(
-                            event.reply_token, TextSendMessage(text="ไม่มีใครอยู่ออฟฟิศ โฮ่ง!"))
-                        return 0
+                input_id = event.source.user_id
+                client = get_client()
+                profile = line_bot_api.get_profile(input_id)
+                sheet = client.open('userCheckin').worksheet('userStatus')
+                user_id = sheet.col_values(2)[1:]
+                requested = sheet.col_values(7)[1:]
 
-                    input_id = event.source.user_id
-                    client = get_client()
-                    profile = line_bot_api.get_profile(input_id)
-                    sheet = client.open('userCheckin').worksheet('userStatus')
-                    user_id = sheet.col_values(2)[1:]
-                    requested = sheet.col_values(7)[1:]
+                if '1' in requested or 1 in requested:
+                    line_bot_api.reply_message(
+                        event.reply_token, TextSendMessage(text="มีคนอื่นขอ check-in โปรดรอสักครู่ โฮ่ง!"))
+                    return 0
 
-                    if '1' in requested or 1 in requested:
-                        line_bot_api.reply_message(
-                            event.reply_token, TextSendMessage(text="มีคนอื่นขอ check-in โปรดรอสักครู่ โฮ่ง!"))
-                        return 0
+                sheet.update_cell(user_id.index(input_id) + 2, 7, "1")
 
-                    sheet.update_cell(user_id.index(input_id) + 2, 7, "1")
+                confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
+                    PostbackAction(label='Yes',text='Yes!',data='check_yes'),
+                    PostbackAction(label='No',text='No!',data='check_no'),
+                ])
+                template_message = TemplateSendMessage(
+                    alt_text='Approve check_in', template=confirm_template)
 
-                    confirm_template = ConfirmTemplate(text='Approve หรือ ไม่?', actions=[
-                        PostbackAction(label='Yes',text='Yes!',data='check_yes'),
-                        PostbackAction(label='No',text='No!',data='check_no'),
-                    ])
-                    template_message = TemplateSendMessage(
-                        alt_text='Approve check_in', template=confirm_template)
+                for i in id_working:
+                    line_bot_api.push_message(i, [TextSendMessage(text=f"คุณ{profile.display_name}"),
+                    TextSendMessage(text=f"ได้ขอทำการ check-in!\nจะ APPROVE หรือไม่?"),
+                    template_message])
 
-                    for i in id_working:
-                        line_bot_api.push_message(i, [TextSendMessage(text=f"คุณ{profile.display_name}"),
-                        TextSendMessage(text=f"ได้ขอทำการ check-in!\nจะ APPROVE หรือไม่?"),
-                        template_message])
-
-                    response_text = "โปรดรอคน APPROVE โฮ่ง!"
-
-                else:
-                    response_text = "check error[2]" + text
+                response_text = "โปรดรอคน APPROVE โฮ่ง!"
 
             else:
                 response_text = "คุณได้ check-in ไปแล้ว! หรือลืม check-out!"
