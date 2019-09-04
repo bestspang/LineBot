@@ -258,8 +258,6 @@ def make_static_tmp_dir():
 def detect_intent_texts(project_id, session_id, text, language_code):
     import dialogflow_v2 as dialogflow
     # key_file_path = "./BPLINEBOT-0106b42afbf3.json"
-    # credentials = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-    # credentials = service_account.Credentials.from_service_account_file(key_file_path)
     # credentials = Credentials.from_service_account_file(key_file_path)
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
@@ -1304,6 +1302,7 @@ def handle_message(event):
                 price = 'นี้คือระบบ test : '
                 textn = text.replace('ทดลอง ', '').replace('test ', '')
                 project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
+                print(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
                 try:
                     fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
                 except Exception as e:
