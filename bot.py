@@ -1305,7 +1305,7 @@ def handle_message(event):
                 try:
                     fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
                 except Exception as e:
-                    print("ERROR: ", e)
+                    print("ERROR: ", e.text)
                     fulfillment_text = "ระบบผิดพลาด"
                 response_text = fulfillment_text
                 line_bot_api.reply_message(
