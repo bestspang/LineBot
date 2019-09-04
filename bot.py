@@ -44,8 +44,11 @@ handler = WebhookHandler(config['line_bot']['handler'])
 #profile = line_bot_api.get_group_member_profile(group_id, user_id)
 static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 
-os.environ["DIALOGFLOW_PROJECT_ID"]="bplinebot"
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="./BPLINEBOT-0106b42afbf3.json"
+base_folder = os.path.dirname(__file__)
+file_path = os.path.join(base_folder, 'BPLINEBOT-0106b42afbf3.json')
+
+os.environ["DIALOGFLOW_PROJECT_ID"] = "bplinebot"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = file_path
 
 mem = Member()
 tools = Tools()
@@ -1300,11 +1303,11 @@ def handle_message(event):
                 textn = text.replace('ทดลอง ', '').replace('test ', '')
                 project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
                 print(os.environ.get('GOOGLE_APPLICATION_CREDENTIALS'))
-                # try:
-                fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-                # except Exception as e:
-                #     print("ERROR: ", e)
-                #     fulfillment_text = "ระบบผิดพลาด"
+                try:
+                    fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
+                except Exception as e:
+                    print("ERROR: ", e)
+                    fulfillment_text = "ระบบผิดพลาด"
                 response_text = fulfillment_text
                 line_bot_api.reply_message(
                     event.reply_token,
