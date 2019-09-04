@@ -21,6 +21,7 @@ from threading import Thread, Event
 from apscheduler.schedulers.background import BackgroundScheduler
 from Member import Member
 from Tools import Vote, Tools, RandomThread
+import dialogflow
 
 __author__ = 'bestspang'
 
@@ -1314,7 +1315,7 @@ def handle_message(event):
 
         ce = random.randint(1,10)
         if ce > 6 and ce < 9:
-            text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'พ่อง', 'โฮ่งง', 'สลัดผัก']
+            text = ['ตูดหมึก', 'หอย', 'WTF!', 'ขี้โม้', 'ไม่เชื่อ!', 'แม่ย้อย', 'โฮ่งง', 'สลัดผัก']
             line_bot_api.reply_message(
                 event.reply_token,
                 TextSendMessage(text=text[random.randint(0,8)]))
