@@ -22,6 +22,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from Member import Member
 from Tools import Vote, Tools, RandomThread
 import dialogflow
+from google.oauth2 import service_account
 
 __author__ = 'bestspang'
 
@@ -259,8 +260,7 @@ def detect_intent_texts(project_id, session_id, text, language_code):
     import dialogflow_v2 as dialogflow
     key_file_path = "./BPLINEBOT-0106b42afbf3.json"
     # credentials = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
-    credentials = ServiceAccountCredentials.from_service_account_file(key_file_path)
-    # credentials = service_account.Credentials.from_service_account_file(key_file_path)
+    credentials = service_account.Credentials.from_service_account_file(key_file_path)
     # credentials = Credentials.from_service_account_file(key_file_path)
     session_client = dialogflow.SessionsClient()
     session = session_client.session_path(project_id, session_id)
