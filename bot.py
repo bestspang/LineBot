@@ -1303,9 +1303,9 @@ def handle_message(event):
                 project_id = os.getenv('DIALOGFLOW_PROJECT_ID')
                 try:
                     fulfillment_text = detect_intent_texts(project_id, "unique", textn, 'th')
-                except:
+                except Exception as e:
+                    print("ERROR: ", e)
                     fulfillment_text = "ระบบผิดพลาด"
-                    pass
                 response_text = fulfillment_text
                 line_bot_api.reply_message(
                     event.reply_token,
