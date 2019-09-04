@@ -87,9 +87,9 @@ def get_who_working_id():
     user_id = sheet.col_values(2)[1:]
     user_name = sheet.col_values(3)[1:]
     is_in = sheet.col_values(4)[1:]
-    is_in = [u for i, u in zip(is_in, user_id) if int(i) == 1]
-    user_in = [u for i, u in zip(is_in, user_name) if int(i) == 1]
-    return is_in, user_in
+    is_inR = [u for i, u in zip(is_in, user_id) if i == '1']
+    user_in = [y for i, y in zip(is_in, user_name) if i == '1']
+    return is_inR, user_in
 
 def who_work():
     client = get_client()
