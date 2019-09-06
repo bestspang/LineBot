@@ -1459,7 +1459,7 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
     elif event.postback.data == 'check_yes':
-        if not is_working(event.source.user_id):
+        if is_working(event.source.user_id):
             profile = line_bot_api.get_profile(event.source.user_id)
             client = get_client()
             sheet = client.open('userCheckin').worksheet('userStatus')
@@ -1478,7 +1478,7 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text=txt))
 
     elif event.postback.data == 'check_no':
-        if not is_working(event.source.user_id):
+        if is_working(event.source.user_id):
             client = get_client()
             sheet = client.open('userCheckin').worksheet('userStatus')
             is_req = sheet.col_values(7)[1:]
