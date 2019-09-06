@@ -1459,36 +1459,42 @@ def handle_postback(event):
             event.reply_token, TextSendMessage(text='โอเคโฮ่งง!'))
 
     elif event.postback.data == 'check_yes':
+        if not is_working(event.source.user_id):
+            profile = line_bot_api.get_profile(event.source.user_id)
+            client = get_client()
+            sheet = client.open('userCheckin').worksheet('userStatus')
+            is_req = sheet.col_values(7)[1:]
+            if '1' in is_req:
+                user_id = sheet.col_values(2)[1:][is_req.index('1')]
 
-        profile = line_bot_api.get_profile(event.source.user_id)
-        client = get_client()
-        sheet = client.open('userCheckin').worksheet('userStatus')
-        is_req = sheet.col_values(7)[1:]
-        if '1' in is_req:
-            user_id = sheet.col_values(2)[1:][is_req.index('1')]
-
-            checkin_out(user_id, "1", True, profile.display_name)
-            txt = 'Approve เรียบร้อย!'
+                checkin_out(user_id, "1", True, profile.display_name)
+                txt = 'Approve เรียบร้อย!'
+            else:
+                txt = 'ไม่มีคนขอ check-in!'
         else:
-            txt = 'ไม่มีคนขอ check-in!'
+            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Aprrove'
+
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
 
     elif event.postback.data == 'check_no':
+        if not is_working(event.source.user_id):
+            client = get_client()
+            sheet = client.open('userCheckin').worksheet('userStatus')
+            is_req = sheet.col_values(7)[1:]
+            if '1' in is_req:
+                user_name = sheet.col_values(3)[1:][is_req.index('1')]
+                user_id = sheet.col_values(2)[1:][is_req.index('1')]
 
-        client = get_client()
-        sheet = client.open('userCheckin').worksheet('userStatus')
-        is_req = sheet.col_values(7)[1:]
-        if '1' in is_req:
-            user_name = sheet.col_values(3)[1:][is_req.index('1')]
-            user_id = sheet.col_values(2)[1:][is_req.index('1')]
-
-            sheet.update_cell(user_id.index(user_id) + 2, 7, '0')
-            txt = 'รับทราบ! ไม่ทำการApprove!'
-            line_bot_api.push_message(abbok_id,
-                                    TextSendMessage(text=f"คุณ {user_name} ไม่ได้รับการ APPROVE โดยคุณ {profile.display_name}"))
+                sheet.update_cell(user_id.index(user_id) + 2, 7, '0')
+                txt = 'รับทราบ! ไม่ทำการApprove!'
+                line_bot_api.push_message(abbok_id,
+                                        TextSendMessage(text=f"คุณ {user_name} ไม่ได้รับการ APPROVE โดยคุณ {profile.display_name}"))
+            else:
+                txt = 'ไม่มีคนขอ check-in!'
         else:
-            txt = 'ไม่มีคนขอ check-in!'
+            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Aprrove'
+
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
 
