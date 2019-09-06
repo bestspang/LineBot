@@ -1472,7 +1472,7 @@ def handle_postback(event):
             else:
                 txt = 'ไม่มีคนขอ check-in!'
         else:
-            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Aprrove'
+            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Approve'
 
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
@@ -1493,7 +1493,7 @@ def handle_postback(event):
             else:
                 txt = 'ไม่มีคนขอ check-in!'
         else:
-            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Aprrove'
+            txt = 'ฮั่นแน่! คุณไม่มีสิทธ์ Approve'
 
         line_bot_api.reply_message(
             event.reply_token, TextSendMessage(text=txt))
