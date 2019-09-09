@@ -59,7 +59,7 @@ to_mem_in = None
 to_mem = None
 
 def get_client():
-    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/dialogflow']
+    scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive'] # 'https://www.googleapis.com/auth/dialogflow'
     creds = ServiceAccountCredentials.from_json_keyfile_name('bplinebot-3ccea59ad6d6.json', scope)
     client = gspread.authorize(creds)
     return client
@@ -134,6 +134,27 @@ def get_user_key(approve=True, check_is_in=False, isw='out'):
                 return in_mem
         return approve_mem
 
+def get_avg_worktime():
+    client = get_client()
+    spread = client.open('userCheckin')
+    sheet = spread.worksheet('log')
+    list_of_lists = sheet.get_all_values()
+    df = pd.DataFrame(list_of_lists[1:], columns = list_of_lists[0])
+    df = df[pd.to_datetime(df['DATE']).dt.month == datetime.datetime.today().month]
+    df['TIME'] = pd.to_datetime(df['TIME']).values.astype(np.int64)
+    df['DATE'] = pd.to_datetime(df['DATE']).dt.date
+    df['USER_ID'] = df['USER_ID'].astype(int)
+    df['TYPE'] = df['TYPE'].astype(int)
+    df = df.set_index('ID')
+    df2 = pd.DataFrame(df.groupby(['USER_ID', 'TYPE'])['TIME'].mean())
+    df2 = df2.reset_index()
+    w_out = df2[df2['TYPE'] == 0].reset_index().drop(["index","TYPE"], axis=1)
+    w_in = df2[df2['TYPE'] == 1].reset_index().drop(["index","TYPE"], axis=1)
+    w_total = w_out.copy()
+    w_total['TIME'] = w_out['TIME'] - w_in['TIME']
+    w_total['TIME'] = pd.to_datetime(w_total['TIME']).dt.time
+    return w_total
+
 def checkin_out(input_id, type, request=False, who=None):
     client = get_client()
     profile = line_bot_api.get_profile(input_id)
@@ -165,23 +186,7 @@ def checkin_out(input_id, type, request=False, who=None):
 
         total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
         ####### AVG IN OUT
-        spread = client.open('userCheckin')
-        sheet = spread.worksheet('log')
-        list_of_lists = sheet.get_all_values()
-        df = pd.DataFrame(list_of_lists[1:], columns = list_of_lists[0])
-        df = df[pd.to_datetime(df['DATE']).dt.month == datetime.datetime.today().month]
-        df['TIME'] = pd.to_datetime(df['TIME']).values.astype(np.int64)
-        df['DATE'] = pd.to_datetime(df['DATE']).dt.date
-        df['USER_ID'] = df['USER_ID'].astype(int)
-        df['TYPE'] = df['TYPE'].astype(int)
-        df = df.set_index('ID')
-        df2 = pd.DataFrame(df.groupby(['USER_ID', 'TYPE'])['TIME'].mean())
-        df2 = df2.reset_index()
-        w_out = df2[df2['TYPE'] == 0].reset_index().drop(["index","TYPE"], axis=1)
-        w_in = df2[df2['TYPE'] == 1].reset_index().drop(["index","TYPE"], axis=1)
-        w_total = w_out.copy()
-        w_total['TIME'] = w_out['TIME'] - w_in['TIME']
-        w_total['TIME'] = pd.to_datetime(w_total['TIME']).dt.time
+        w_total = get_avg_worktime()
         avg_worktime = w_total[w_total['USER_ID'] == user_id.index(input_id) + 1]['TIME'].values[0].strftime("%H:%M:%S")
         avg_text = 'ในเดือนนี้คุณได้ทำงานเฉลี่ยเป็นเวลา {} ช.ม. ต่อวัน'.format(avg_worktime)
         #######
