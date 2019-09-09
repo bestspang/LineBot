@@ -140,7 +140,7 @@ def get_avg_worktime():
     spread = client.open('userCheckin')
     sheet = spread.worksheet('log')
     list_of_lists = sheet.get_all_values()
-    df = pd.DataFrame(list_of_lists[1:], columns = list_of_lists[0])
+    df = pd.DataFrame(list_of_lists[1:], columns=list_of_lists[0])
     df = df[pd.to_datetime(df['DATE']).dt.month == datetime.datetime.today().month]
     df['TIME'] = pd.to_datetime(df['TIME']).values.astype(np.int64)
     df['DATE'] = pd.to_datetime(df['DATE']).dt.date
