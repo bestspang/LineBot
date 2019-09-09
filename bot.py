@@ -134,6 +134,7 @@ def get_user_key(approve=True, check_is_in=False, isw='out'):
                 return in_mem
         return approve_mem
 
+
 def get_avg_worktime():
     client = get_client()
     spread = client.open('userCheckin')
@@ -154,6 +155,7 @@ def get_avg_worktime():
     w_total['TIME'] = w_out['TIME'] - w_in['TIME']
     w_total['TIME'] = pd.to_datetime(w_total['TIME']).dt.time
     return w_total
+
 
 def checkin_out(input_id, type, request=False, who=None):
     client = get_client()
@@ -182,8 +184,7 @@ def checkin_out(input_id, type, request=False, who=None):
             text = f"Check-In! APPROVE โดย {who}"
     elif type == "0":
         text = "Check-out!"
-        total_work =  (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
-
+        total_work = (datetime.datetime.now() + datetime.timedelta(seconds = 25200)) - datetime.datetime.strptime(sheet.cell(user_id.index(input_id) + 2, 5).value, '%I:%M %p')
         total_work = "คุณทำงานทั้งหมดเป็นเวลา {} ช.ม. {} นาที {} วินาที".format(total_work.seconds//3600,(total_work.seconds//60)%60,total_work.seconds%60)
         ####### AVG IN OUT
         w_total = get_avg_worktime()
