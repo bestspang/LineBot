@@ -151,9 +151,12 @@ def get_avg_worktime():
     df2 = df2.reset_index()
     w_out = df2[df2['TYPE'] == 0].reset_index().drop(["index","TYPE"], axis=1)
     w_in = df2[df2['TYPE'] == 1].reset_index().drop(["index","TYPE"], axis=1)
+    new_df = pd.merge(w_out, w_in,  how='left', left_on=['USER_ID','DATE'], right_on = ['USER_ID','DATE'])
     w_total = w_out.copy()
-    w_total['TIME'] = w_out['TIME'] - w_in['TIME']
+    w_total['TIME'] = new_df['TIME_x'] - new_df['TIME_y']
+    w_total = w_total.groupby(['USER_ID']).mean()
     w_total['TIME'] = pd.to_datetime(w_total['TIME']).dt.time
+    w_total = w_total.reset_index()
     return w_total
 
 
@@ -848,6 +851,18 @@ def handle_message(event):
             event.reply_token,
             TextSendMessage(text=response_text))
         return 0
+
+    if text.startswith('ขอเวลาทำงานเฉลี่ย'):
+        client = get_client()
+        input_id = event.source.user_id
+        sheet = client.open('userCheckin').worksheet('userStatus')
+        user_id = sheet.col_values(2)[1:]
+        w_total = get_avg_worktime()
+        avg_worktime = w_total[w_total['USER_ID'] == user_id.index(input_id) + 1]['TIME'].values[0].strftime("%H:%M:%S")
+        avg_text = 'ในเดือนนี้คุณได้ทำงานเฉลี่ยเป็นเวลา {} ช.ม. ต่อวัน'.format(avg_worktime)
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=avg_text))
 
     if text.startswith('ขอcheck'):
         rank = member_rank(event.source.user_id)
