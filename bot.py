@@ -147,11 +147,12 @@ def get_avg_worktime():
     df['USER_ID'] = df['USER_ID'].astype(int)
     df['TYPE'] = df['TYPE'].astype(int)
     df = df.set_index('ID')
-    df2 = pd.DataFrame(df.groupby(['USER_ID', 'TYPE'])['TIME'].mean())
+    df2 = pd.DataFrame(df.groupby(['USER_ID', 'DATE', 'TYPE'])['TIME'].mean())
+    df2['INOUT'] = pd.to_datetime(df2['TIME']).dt.time
     df2 = df2.reset_index()
     w_out = df2[df2['TYPE'] == 0].reset_index().drop(["index","TYPE"], axis=1)
     w_in = df2[df2['TYPE'] == 1].reset_index().drop(["index","TYPE"], axis=1)
-    new_df = pd.merge(w_out, w_in,  how='left', left_on=['USER_ID','DATE'], right_on = ['USER_ID','DATE'])
+    new_df = pd.merge(w_out, w_in,  how='left', left_on=['USER_ID', 'DATE'], right_on = ['USER_ID', 'DATE'])
     w_total = w_out.copy()
     w_total['TIME'] = new_df['TIME_x'] - new_df['TIME_y']
     w_total = w_total.groupby(['USER_ID']).mean()
