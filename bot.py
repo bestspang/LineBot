@@ -494,7 +494,7 @@ def talk_count(input_id):
     sheet = client.open('userCheckin').worksheet('userStatus')
     user_id = sheet.col_values(2)[1:]
     index = user_id.index(input_id) + 2
-    score = sheet.col_values(9)[1:][index - 1]
+    score = sheet.col_values(9)[1:][index - 2]
     sheet.update_cell(index, 9, str(int(score) + 1))
 
 
