@@ -495,7 +495,7 @@ def talk_count(input_id):
     user_id = sheet.col_values(2)[1:]
     index = user_id.index(input_id) + 2
     score = sheet.col_values(9)[1:][index]
-    sheet.update_cell(index, 9, str(score + 1))
+    sheet.update_cell(index, 9, str(int(score) + 1))
 
 
 def getTable(stock_quote):
